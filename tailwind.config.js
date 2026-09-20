@@ -12,7 +12,11 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Noto Sans', 'Noto Sans Arabic', ...defaultTheme.fontFamily.sans],
+            },
+            colors: {
+                primary: '#0F172A',
+                'on-primary': '#FFFFFF',
             },
         },
     },

@@ -29,6 +29,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/visits/create', [VisitController::class, 'create'])->name('visits.create');
     Route::post('/visits', [VisitController::class, 'store'])->name('visits.store');
     Route::patch('/visits/{visit}/check-out', [VisitController::class, 'checkOut'])->name('visits.check-out');
+
+    Route::patch('/locale', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate(['locale' => 'required|in:en,ar']);
+        $request->user()->update(['locale' => $validated['locale']]);
+
+        return back();
+    })->name('locale.update');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
