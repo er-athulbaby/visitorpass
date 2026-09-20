@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\ProfileController;
@@ -26,6 +27,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
     Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('companies', CompanyController::class)->only(['index', 'store', 'destroy']);
 });
 
 require __DIR__.'/auth.php';
