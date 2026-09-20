@@ -24,9 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/visits', fn () => 'visits index placeholder')->name('visits.index');
+    Route::get('/visits', [VisitController::class, 'index'])->name('visits.index');
     Route::get('/visits/create', [VisitController::class, 'create'])->name('visits.create');
     Route::post('/visits', [VisitController::class, 'store'])->name('visits.store');
+    Route::patch('/visits/{visit}/check-out', [VisitController::class, 'checkOut'])->name('visits.check-out');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
