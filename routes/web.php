@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SetupController;
+use App\Http\Controllers\VisitController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,6 +23,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/visits', fn () => 'visits index placeholder')->name('visits.index');
+    Route::get('/visits/create', [VisitController::class, 'create'])->name('visits.create');
+    Route::post('/visits', [VisitController::class, 'store'])->name('visits.store');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
