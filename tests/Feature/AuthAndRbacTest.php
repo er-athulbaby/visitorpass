@@ -9,7 +9,7 @@ beforeEach(function () {
 });
 
 test('a guest is redirected to login when visiting an admin route', function () {
-    $response = $this->get('/admin/ping');
+    $response = $this->get('/admin/departments');
 
     $response->assertRedirect('/login');
 });
@@ -18,7 +18,7 @@ test('a receptionist is forbidden from an admin route', function () {
     $receptionist = User::factory()->create();
     $receptionist->assignRole('receptionist');
 
-    $response = $this->actingAs($receptionist)->get('/admin/ping');
+    $response = $this->actingAs($receptionist)->get('/admin/departments');
 
     $response->assertForbidden();
 });
@@ -27,7 +27,7 @@ test('an admin can access an admin route', function () {
     $admin = User::factory()->create();
     $admin->assignRole('admin');
 
-    $response = $this->actingAs($admin)->get('/admin/ping');
+    $response = $this->actingAs($admin)->get('/admin/departments');
 
     $response->assertOk();
 });
