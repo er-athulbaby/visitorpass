@@ -40,8 +40,18 @@ class UserController extends Controller
             ->with('status', __('User created.'));
     }
 
-    public function destroy(User $user): RedirectResponse
+    public function destroy(Request $request, User $user): RedirectResponse
     {
+        if ($user->is($request->user())) {
+            return redirect()->route('admin.users.index')
+                ->with('error', __('You cannot delete your own account.'));
+        }
+
+        if ($user->hasRole('admin') && User::role('admin')->count() <= 1) {
+            return redirect()->route('admin.users.index')
+                ->with('error', __('Cannot delete the last remaining admin.'));
+        }
+
         $user->delete();
 
         return redirect()->route('admin.users.index')

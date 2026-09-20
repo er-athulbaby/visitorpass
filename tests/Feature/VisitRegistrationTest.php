@@ -75,3 +75,35 @@ test('registering a returning visitor by existing cpr_number reuses the visitor 
 
     expect(Visitor::where('cpr_number', '990101123')->count())->toBe(1);
 });
+
+test('registering a returning visitor without retyping mobile number keeps the stored one', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $department = Department::create(['name' => 'IT']);
+    $employee = $department->employees()->create(['name' => 'Sam Host']);
+
+    Visitor::create(['cpr_number' => '990101123', 'name' => 'Ali Visitor', 'mobile_number' => '33445566', 'company_name' => 'Acme']);
+
+    $this->actingAs($this->receptionist)->post('/visits', [
+        'cpr_number' => '990101123',
+        'name' => 'Ali Visitor',
+        'employee_id' => $employee->id,
+    ]);
+
+    $visitor = Visitor::where('cpr_number', '990101123')->first();
+    expect($visitor->mobile_number)->toBe('33445566');
+    expect($visitor->company_name)->toBe('Acme');
+});
+
+test('building mode rejects an employee_id field', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'building']);
+    $department = Department::create(['name' => 'IT']);
+    $employee = $department->employees()->create(['name' => 'Sam Host']);
+
+    $response = $this->actingAs($this->receptionist)->post('/visits', [
+        'cpr_number' => '990101124',
+        'name' => 'Fatima Visitor',
+        'employee_id' => $employee->id,
+    ]);
+
+    $response->assertSessionHasErrors('company_id');
+});

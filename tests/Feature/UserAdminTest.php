@@ -34,6 +34,28 @@ test('admin can deactivate a user by deleting them', function () {
     expect(User::find($user->id))->toBeNull();
 });
 
+test('admin cannot delete their own account', function () {
+    $response = $this->actingAs($this->admin)->delete("/admin/users/{$this->admin->id}");
+
+    $response->assertSessionHas('error');
+    expect(User::find($this->admin->id))->not->toBeNull();
+});
+
+test('admin cannot delete the last remaining admin', function () {
+    $otherAdmin = User::factory()->create();
+    $otherAdmin->assignRole('admin');
+
+    $response = $this->actingAs($this->admin)->delete("/admin/users/{$otherAdmin->id}");
+
+    $response->assertRedirect('/admin/users');
+    expect(User::find($otherAdmin->id))->toBeNull();
+
+    $response = $this->actingAs($this->admin)->delete("/admin/users/{$this->admin->id}");
+
+    $response->assertSessionHas('error');
+    expect(User::find($this->admin->id))->not->toBeNull();
+});
+
 test('a receptionist cannot access the users admin screen', function () {
     $receptionist = User::factory()->create();
     $receptionist->assignRole('receptionist');

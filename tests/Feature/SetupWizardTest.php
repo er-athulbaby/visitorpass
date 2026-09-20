@@ -3,11 +3,24 @@
 use App\Models\Setting;
 use App\Models\User;
 
-beforeEach(function () {
-    $this->seed(\Database\Seeders\RoleSeeder::class);
+test('completing the wizard works on a completely fresh database with no roles seeded', function () {
+    $response = $this->post('/setup', [
+        'deployment_mode' => 'company',
+        'admin_name' => 'Jane Admin',
+        'admin_email' => 'jane@example.com',
+        'admin_password' => 'password123',
+        'admin_password_confirmation' => 'password123',
+    ]);
+
+    $response->assertRedirect('/login');
+
+    $admin = User::where('email', 'jane@example.com')->first();
+    expect($admin)->not->toBeNull();
+    expect($admin->hasRole('admin'))->toBeTrue();
 });
 
 test('completing the wizard in company mode creates settings and an admin user', function () {
+    $this->seed(\Database\Seeders\RoleSeeder::class);
     $response = $this->post('/setup', [
         'deployment_mode' => 'company',
         'admin_name' => 'Jane Admin',

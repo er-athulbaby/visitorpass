@@ -15,6 +15,30 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('visits.index')" :active="request()->routeIs('visits.*')">
+                        {{ __('Visits') }}
+                    </x-nav-link>
+
+                    @role('admin')
+                        @if (\App\Models\Setting::current()?->deployment_mode === 'company')
+                            <x-nav-link :href="route('admin.departments.index')" :active="request()->routeIs('admin.departments.*')">
+                                {{ __('Departments') }}
+                            </x-nav-link>
+
+                            <x-nav-link :href="route('admin.employees.index')" :active="request()->routeIs('admin.employees.*')">
+                                {{ __('Employees') }}
+                            </x-nav-link>
+                        @else
+                            <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                                {{ __('Companies') }}
+                            </x-nav-link>
+                        @endif
+
+                        <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                            {{ __('Users') }}
+                        </x-nav-link>
+                    @endrole
                 </div>
             </div>
 

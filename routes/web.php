@@ -39,9 +39,15 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
-    Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'destroy']);
-    Route::resource('companies', CompanyController::class)->only(['index', 'store', 'destroy']);
+    Route::middleware('mode:company')->group(function () {
+        Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'destroy']);
+    });
+
+    Route::middleware('mode:building')->group(function () {
+        Route::resource('companies', CompanyController::class)->only(['index', 'store', 'destroy']);
+    });
+
     Route::resource('users', UserController::class)->only(['index', 'store', 'destroy']);
 });
 

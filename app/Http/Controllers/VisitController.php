@@ -52,14 +52,17 @@ class VisitController extends Controller
     {
         $validated = $request->validated();
 
-        $visitor = Visitor::updateOrCreate(
-            ['cpr_number' => $validated['cpr_number']],
+        $visitorUpdates = array_filter(
             [
                 'name' => $validated['name'],
                 'company_name' => $validated['company_name'] ?? null,
                 'mobile_number' => $validated['mobile_number'] ?? null,
-            ]
+            ],
+            fn ($value) => $value !== null
         );
+
+        $visitor = Visitor::firstOrNew(['cpr_number' => $validated['cpr_number']]);
+        $visitor->fill($visitorUpdates)->save();
 
         $visitor->visits()->create([
             'mobile_number' => $validated['mobile_number'] ?? null,
