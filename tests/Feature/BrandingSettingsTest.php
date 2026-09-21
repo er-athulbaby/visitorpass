@@ -25,7 +25,8 @@ test('admin can view the settings screen', function () {
     $response = $this->actingAs($this->admin)->get('/admin/settings');
 
     $response->assertOk();
-    $response->assertSee('#0F172A', false);
+    $response->assertSee('name="primary_color"', false);
+    $response->assertSee('value="#0F172A"', false);
 });
 
 test('admin can update the primary color', function () {
@@ -58,6 +59,20 @@ test('admin can upload a logo', function () {
 
     $response->assertRedirect('/admin/settings');
     $path = Setting::current()->logo_path;
+    expect($path)->not->toBeNull();
+    Storage::disk('public')->assertExists($path);
+});
+
+test('admin can upload an ico file as the favicon', function () {
+    Storage::fake('public');
+
+    $response = $this->actingAs($this->admin)->patch('/admin/settings', [
+        'primary_color' => '#0F172A',
+        'favicon' => UploadedFile::fake()->create('favicon.ico', 10),
+    ]);
+
+    $response->assertRedirect('/admin/settings');
+    $path = Setting::current()->favicon_path;
     expect($path)->not->toBeNull();
     Storage::disk('public')->assertExists($path);
 });

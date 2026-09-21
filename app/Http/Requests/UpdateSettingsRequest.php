@@ -17,7 +17,7 @@ class UpdateSettingsRequest extends FormRequest
             'primary_color' => ['required', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'tagline' => ['nullable', 'string', 'max:255'],
             'logo' => ['nullable', 'image', 'max:2048'],
-            'favicon' => ['nullable', 'image', 'max:1024'],
+            'favicon' => ['nullable', 'mimes:png,ico,jpg,jpeg,webp', 'max:1024'],
         ];
     }
 }

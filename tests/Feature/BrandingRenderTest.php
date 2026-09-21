@@ -29,3 +29,13 @@ test('the app layout falls back to the default favicon when none is set', functi
 
     $response->assertSee('favicon.ico', false);
 });
+
+test('the primary button component on the login screen uses the brand color', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company', 'primary_color' => '#EF4135']);
+
+    $response = $this->get('/login');
+
+    $response->assertSee('bg-primary', false);
+    $response->assertSee('text-on-primary', false);
+    $response->assertDontSee('bg-gray-800', false);
+});

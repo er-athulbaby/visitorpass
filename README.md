@@ -29,7 +29,12 @@ database you've created for this install.
 
 ```bash
 php artisan migrate
+php artisan storage:link
 ```
+
+The `storage:link` step is required — without it, an admin's uploaded
+logo/favicon (Admin > Settings) will 404 on every page, since public
+uploads are served from `storage/app/public` via that symlink.
 
 Then visit the site in a browser. On first load, the setup wizard walks
 through choosing Company or Building mode and creating the first admin
