@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/visits/{visit}/check-out', [VisitController::class, 'checkOut'])->name('visits.check-out');
 
     Route::get('/visitors/lookup', [VisitorLookupController::class, 'lookup'])->name('visitors.lookup');
+    Route::get('/visitors/autocomplete', [VisitorLookupController::class, 'autocomplete'])->name('visitors.autocomplete');
 
     Route::patch('/locale', function (\Illuminate\Http\Request $request) {
         $validated = $request->validate(['locale' => 'required|in:en,ar']);

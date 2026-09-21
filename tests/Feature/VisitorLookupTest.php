@@ -48,3 +48,50 @@ test('a guest cannot access the lookup endpoint', function () {
 
     $response->assertUnauthorized();
 });
+
+test('autocomplete returns visitors matching a cpr prefix', function () {
+    Visitor::create(['cpr_number' => '990101123', 'name' => 'Ali Visitor']);
+    Visitor::create(['cpr_number' => '990101124', 'name' => 'Fatima Visitor']);
+    Visitor::create(['cpr_number' => '880202111', 'name' => 'Not A Match']);
+
+    $response = $this->actingAs($this->receptionist)->getJson('/visitors/autocomplete?q=990101');
+
+    $response->assertOk();
+    $response->assertJsonCount(2);
+    $response->assertJsonFragment(['name' => 'Ali Visitor']);
+    $response->assertJsonFragment(['name' => 'Fatima Visitor']);
+});
+
+test('autocomplete caps results at 8', function () {
+    for ($i = 0; $i < 10; $i++) {
+        Visitor::create([
+            'cpr_number' => '9901011' . str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+            'name' => "Visitor {$i}",
+        ]);
+    }
+
+    $response = $this->actingAs($this->receptionist)->getJson('/visitors/autocomplete?q=990101');
+
+    $response->assertOk();
+    $response->assertJsonCount(8);
+});
+
+test('autocomplete with no match returns an empty array', function () {
+    $response = $this->actingAs($this->receptionist)->getJson('/visitors/autocomplete?q=000000');
+
+    $response->assertOk();
+    $response->assertExactJson([]);
+});
+
+test('autocomplete with a missing q parameter returns an empty array', function () {
+    $response = $this->actingAs($this->receptionist)->getJson('/visitors/autocomplete');
+
+    $response->assertOk();
+    $response->assertExactJson([]);
+});
+
+test('a guest cannot access the autocomplete endpoint', function () {
+    $response = $this->getJson('/visitors/autocomplete?q=990101');
+
+    $response->assertUnauthorized();
+});

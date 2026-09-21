@@ -28,4 +28,20 @@ class VisitorLookupController extends Controller
             'mobile_number' => $visitor->mobile_number,
         ]);
     }
+
+    public function autocomplete(Request $request): JsonResponse
+    {
+        $query = $request->query('q');
+
+        if (! $query) {
+            return response()->json([]);
+        }
+
+        $visitors = Visitor::where('cpr_number', 'like', $query . '%')
+            ->orderBy('cpr_number')
+            ->limit(8)
+            ->get(['id', 'cpr_number', 'name']);
+
+        return response()->json($visitors);
+    }
 }
