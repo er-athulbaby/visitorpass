@@ -46,7 +46,9 @@ at BOC, talking to the "eReveler GCC CardRead Server" Windows service at
 - **Two new Laravel JSON endpoints** support the "returning visitor"
   features, both under `auth` middleware (receptionist or admin):
   - `GET /visitors/lookup?cpr=...` — exact match, returns `{name,
-    company_name, mobile_number}` for auto-fill, or 404 if no match.
+    company_name, mobile_number}` on match, or `{}` (200) if no match —
+    200 rather than 404 so the client never has to distinguish "no match"
+    from "request failed" in its error-handling branch.
   - `GET /visitors/autocomplete?q=...` — prefix match on `cpr_number`,
     returns up to 8 `{id, cpr_number, name}` results.
 
@@ -83,13 +85,35 @@ at BOC, talking to the "eReveler GCC CardRead Server" Windows service at
 - **CPR reader returning an empty/removed-card response**: treated the
   same as "no card scanned yet" — no error shown, just no auto-fill.
 
+## Known Production Constraint: Private Network Access
+
+When this app is deployed over HTTPS (as every other VisitorPass
+deployment is), Chrome/Edge send a **Private Network Access** preflight
+(`Access-Control-Request-Private-Network`) for any request from a public
+HTTPS origin to a loopback address — separately from, and in addition to,
+the ordinary CORS preflight the `text/plain` trick avoids. The GCC server
+has no `OPTIONS` handler at all, so this preflight will fail, and the scan
+will land in the "Reader not available" fallback even though the service
+is running correctly. This is a browser security policy, not something
+fixable by changing the request's content type or headers — a true fix
+would require a local proxy/companion process on the reception PC, which
+is out of scope for this phase. Concretely: manual verification of the
+scan flow must be re-run against the actual HTTPS deployment origin
+before shipping to a customer, not just against a plain-HTTP local dev
+server — this phase's local verification only covered the plain-HTTP
+case. Safari also blocks `http://localhost` fetches from an HTTPS page
+entirely (Chrome and Firefox treat it as a "potentially trustworthy"
+mixed-content exception; Safari does not) — worth knowing if any
+reception PC runs Safari.
+
 ## Testing
 
 - `GET /visitors/lookup`: feature tests for exact match (returns saved
-  data), no match (404), and unauthenticated access (redirect/403).
+  data), no match (returns `{}`, 200), a malformed non-string parameter,
+  and unauthenticated access (401 JSON response).
 - `GET /visitors/autocomplete`: feature tests for prefix match returning
-  results, the 8-result cap, no match (empty array), and unauthenticated
-  access.
+  results, the 8-result cap, no match (empty array), a malformed
+  non-string parameter (e.g. `q[]=1`), and unauthenticated access.
 - The Alpine/hardware-scan piece itself: **no automated test** — same
   testing boundary as Phase 1. The plan will call out manual verification
   against real hardware as a required step, with the company-name

@@ -20,7 +20,7 @@
                 <div class="bg-blue-50 rounded p-4 mb-4">
                     <h2 class="font-semibold mb-2">{{ __('Visitor Information') }}</h2>
 
-                    <div class="mb-3 relative">
+                    <div class="mb-3 relative" @click.outside="suggestions = []">
                         <label for="cpr_number">{{ __('CPR Number') }}</label>
                         <input
                             id="cpr_number"
@@ -31,6 +31,7 @@
                             x-model="cprNumber"
                             @input="onCprInput()"
                             @blur="lookupCpr()"
+                            @keydown.escape="suggestions = []"
                             autocomplete="off"
                             required
                         >

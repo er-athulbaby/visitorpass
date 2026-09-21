@@ -12,7 +12,7 @@ class VisitorLookupController extends Controller
     {
         $cpr = $request->query('cpr');
 
-        if (! $cpr) {
+        if (! is_string($cpr) || $cpr === '') {
             return response()->json([]);
         }
 
@@ -33,7 +33,7 @@ class VisitorLookupController extends Controller
     {
         $query = $request->query('q');
 
-        if (! $query) {
+        if (! is_string($query) || $query === '') {
             return response()->json([]);
         }
 

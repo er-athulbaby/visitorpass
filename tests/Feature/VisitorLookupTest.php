@@ -95,3 +95,17 @@ test('a guest cannot access the autocomplete endpoint', function () {
 
     $response->assertUnauthorized();
 });
+
+test('autocomplete with an array q parameter returns an empty array instead of erroring', function () {
+    $response = $this->actingAs($this->receptionist)->getJson('/visitors/autocomplete?q[]=1');
+
+    $response->assertOk();
+    $response->assertExactJson([]);
+});
+
+test('the registration page renders successfully', function () {
+    $response = $this->actingAs($this->receptionist)->get('/visits/create');
+
+    $response->assertOk();
+    $response->assertSee('Scan CPR');
+});
