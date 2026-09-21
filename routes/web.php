@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SetupController;
 use App\Http\Controllers\VisitController;
+use App\Http\Controllers\VisitorLookupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/visits/create', [VisitController::class, 'create'])->name('visits.create');
     Route::post('/visits', [VisitController::class, 'store'])->name('visits.store');
     Route::patch('/visits/{visit}/check-out', [VisitController::class, 'checkOut'])->name('visits.check-out');
+
+    Route::get('/visitors/lookup', [VisitorLookupController::class, 'lookup'])->name('visitors.lookup');
 
     Route::patch('/locale', function (\Illuminate\Http\Request $request) {
         $validated = $request->validate(['locale' => 'required|in:en,ar']);
