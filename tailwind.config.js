@@ -15,8 +15,8 @@ export default {
                 sans: ['Noto Sans', 'Noto Sans Arabic', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                primary: '#0F172A',
-                'on-primary': '#FFFFFF',
+                primary: 'var(--color-primary)',
+                'on-primary': 'var(--color-on-primary)',
             },
         },
     },

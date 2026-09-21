@@ -1,3 +1,10 @@
+@php
+    $brandSettings = \App\Models\Setting::current();
+    $brandPrimary = $brandSettings->primary_color ?? '#0F172A';
+    $brandOnPrimary = $brandSettings?->onPrimaryColor() ?? '#FFFFFF';
+    $brandFaviconUrl = $brandSettings?->favicon_path ? \Illuminate\Support\Facades\Storage::url($brandSettings->favicon_path) : asset('favicon.ico');
+    $brandLogoUrl = $brandSettings?->logo_path ? \Illuminate\Support\Facades\Storage::url($brandSettings->logo_path) : null;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
     <head>
@@ -6,6 +13,14 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <link rel="icon" href="{{ $brandFaviconUrl }}">
+        <style>
+            :root {
+                --color-primary: {{ $brandPrimary }};
+                --color-on-primary: {{ $brandOnPrimary }};
+            }
+        </style>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -1,3 +1,10 @@
+@php
+    $brandSettings = \App\Models\Setting::current();
+    $brandPrimary = $brandSettings->primary_color ?? '#0F172A';
+    $brandOnPrimary = $brandSettings?->onPrimaryColor() ?? '#FFFFFF';
+    $brandFaviconUrl = $brandSettings?->favicon_path ? \Illuminate\Support\Facades\Storage::url($brandSettings->favicon_path) : asset('favicon.ico');
+    $brandLogoUrl = $brandSettings?->logo_path ? \Illuminate\Support\Facades\Storage::url($brandSettings->logo_path) : null;
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -6,6 +13,14 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
+
+        <link rel="icon" href="{{ $brandFaviconUrl }}">
+        <style>
+            :root {
+                --color-primary: {{ $brandPrimary }};
+                --color-on-primary: {{ $brandOnPrimary }};
+            }
+        </style>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,8 +33,15 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    @if ($brandLogoUrl)
+                        <img src="{{ $brandLogoUrl }}" alt="{{ config('app.name') }}" class="w-20 h-20 object-contain">
+                    @else
+                        <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    @endif
                 </a>
+                @if ($brandSettings?->tagline)
+                    <p class="text-center text-sm text-gray-600 mt-2">{{ $brandSettings->tagline }}</p>
+                @endif
             </div>
 
             <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
