@@ -30,7 +30,7 @@
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-background md:flex">
-            <aside class="hidden w-64 shrink-0 flex-col border-r border-outline-variant bg-surface-container-lowest md:flex">
+            <aside class="hidden w-64 shrink-0 flex-col border-e border-outline-variant bg-surface-container-lowest md:flex">
                 <div class="flex items-center justify-center gap-2 border-b border-outline-variant px-6 py-6">
                     @if ($brandLogoUrl)
                         <img src="{{ $brandLogoUrl }}" alt="{{ config('app.name') }}" class="h-20 object-contain">
@@ -42,8 +42,10 @@
                 @include('layouts.sidebar-nav', ['variant' => 'sidebar'])
 
                 <div class="border-t border-outline-variant p-4">
-                    <p class="text-label-md text-on-surface">{{ Auth::user()->name }}</p>
-                    <p class="text-label-sm text-on-surface-variant">{{ Auth::user()->getRoleNames()->first() === 'admin' ? __('Administrator') : __('Receptionist') }}</p>
+                    <a href="{{ route('profile.edit') }}" class="block hover:underline">
+                        <p class="text-label-md text-on-surface">{{ Auth::user()->name }}</p>
+                        <p class="text-label-sm text-on-surface-variant">{{ Auth::user()->getRoleNames()->first() === 'admin' ? __('Administrator') : __('Receptionist') }}</p>
+                    </a>
                     <form method="POST" action="{{ route('locale.update') }}" class="mt-3">
                         @csrf
                         @method('PATCH')
@@ -63,12 +65,17 @@
             <div class="flex min-h-screen flex-1 flex-col">
                 <header class="flex items-center justify-between border-b border-outline-variant bg-surface-container-lowest px-4 py-3 md:hidden">
                     <span class="text-headline-md-mobile text-primary">{{ config('app.name') }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" aria-label="{{ __('Sign out') }}" class="text-on-surface-variant">
-                            <x-icon name="logout" />
-                        </button>
-                    </form>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('profile.edit') }}" aria-label="{{ __('Profile') }}" class="text-on-surface-variant">
+                            <x-icon name="person" />
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" aria-label="{{ __('Sign out') }}" class="text-on-surface-variant">
+                                <x-icon name="logout" />
+                            </button>
+                        </form>
+                    </div>
                 </header>
 
                 @isset($header)

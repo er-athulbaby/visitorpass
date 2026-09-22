@@ -58,7 +58,42 @@ test('the header slot still renders on pages that pass one', function () {
     $response = $this->actingAs($user)->get('/profile');
 
     $response->assertOk();
-    $response->assertSee(__('Profile'));
+    // Asserting on the header wrapper's own markup, not just the word
+    // "Profile" — that word also appears in the page body's own heading
+    // ("Profile Information"), so a plain assertSee('Profile') would
+    // still pass even if the $header slot were deleted entirely.
+    $response->assertSee('font-semibold text-xl text-gray-800 leading-tight', false);
+});
+
+test('the bottom nav is hidden on desktop widths via md:hidden', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertOk();
+    $response->assertSee('bottom-0 flex border-t border-outline-variant bg-surface-container-lowest md:hidden', false);
+});
+
+test('the sidebar divider uses a logical border side so it renders correctly in RTL', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertOk();
+    $response->assertSee('border-e', false);
+    $response->assertDontSee('border-r ', false);
+});
+
+test('the profile page is reachable from the sidebar', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertOk();
+    $response->assertSee(route('profile.edit'), false);
 });
 
 test('the locale toggle is still present and functional in the new sidebar', function () {
