@@ -128,23 +128,48 @@
                     try {
                         const response = await fetch('http://localhost:5050/api/operation/ReadCard', {
                             method: 'POST',
+                            // Deliberately text/plain, not application/json: this server has
+                            // no CORS preflight handler (OPTIONS 404s), so the request must
+                            // stay a CORS "simple request" or the browser blocks it before
+                            // it's ever sent. The server ignores the declared content type
+                            // and JSON-parses the raw body anyway.
                             headers: { 'Content-Type': 'text/plain' },
                             body: JSON.stringify({
+                                ReadCardInfo: false,
+                                ReadPersonalInfo: true,
+                                ReadAddressDetails: false,
+                                ReadBiometrics: false,
                                 ReadEmploymentInfo: true,
                                 ReadImmigrationDetails: true,
+                                ReadTrafficDetails: false,
+                                SilentReading: false,
+                                ReaderIndex: -1,
+                                ReaderName: '',
+                                OutputFormat: 'JSON',
+                                ValidateCard: false,
                             }),
                         });
 
+                        if (!response.ok) {
+                            throw new Error(`Reader server returned HTTP ${response.status}`);
+                        }
+
                         const data = await response.json();
 
-                        if (!data || !data.CPRNumber) {
+                        if (data.ErrorDescription) {
+                            throw new Error(data.ErrorDescription);
+                        }
+
+                        const cprNumber = (data.IdNumber || data.MiscellaneousTextData?.CPRNO || '').trim();
+
+                        if (!cprNumber) {
                             this.scanMessage = '{{ __('No card detected. Enter CPR manually.') }}';
                             return;
                         }
 
-                        this.cprNumber = data.CPRNumber;
-                        this.visitorName = data.NameEnglish || data.Name || '';
-                        this.companyName = data.EmployerName || data.SponserNameEnglish || data.EmploymentNameEnglish || '';
+                        this.cprNumber = cprNumber;
+                        this.visitorName = (data.EnglishFullName || [data.EnglishFirstName, data.EnglishLastName].filter(Boolean).join(' ') || '').trim();
+                        this.companyName = (data.EmployerName || data.SponserNameEnglish || data.EmploymentNameEnglish || '').trim();
                         this.scanMessage = '';
 
                         await this.lookupCpr();
