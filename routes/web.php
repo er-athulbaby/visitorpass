@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/visits/{visit}/check-out', [VisitController::class, 'checkOut'])->name('visits.check-out');
 
     Route::get('/history', [VisitHistoryController::class, 'index'])->name('history.index');
+    Route::get('/history/export', [VisitHistoryController::class, 'export'])->name('history.export');
 
     Route::get('/visitors/lookup', [VisitorLookupController::class, 'lookup'])->name('visitors.lookup');
     Route::get('/visitors/autocomplete', [VisitorLookupController::class, 'autocomplete'])->name('visitors.autocomplete');
