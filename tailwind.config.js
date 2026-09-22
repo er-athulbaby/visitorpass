@@ -42,12 +42,6 @@ export default {
                 warning: '#b06000',
                 'warning-container': '#ffe6c7',
             },
-            borderRadius: {
-                DEFAULT: '0.125rem',
-                lg: '0.25rem',
-                xl: '0.5rem',
-                full: '0.75rem',
-            },
             spacing: {
                 base: '8px',
                 'stack-sm': '12px',

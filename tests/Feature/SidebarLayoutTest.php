@@ -107,6 +107,28 @@ test('the locale toggle is still present and functional in the new sidebar', fun
     $response->assertSee('value="ar"', false);
 });
 
+test('the locale toggle has a language icon', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertOk();
+    $response->assertSeeInOrder([route('locale.update'), 'material-symbols-outlined', '>language<'], false);
+});
+
+test('the sidebar footer credits the developer with a version and a hyperlink', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertOk();
+    $response->assertSee('v1.0', false);
+    $response->assertSee('href="https://deverra.me"', false);
+    $response->assertSee('DeVerra Technologies', false);
+});
+
 test('every existing page that used the old layout still renders under the new one', function () {
     Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     Role::firstOrCreate(['name' => 'admin']);

@@ -49,8 +49,8 @@
                     <form method="POST" action="{{ route('locale.update') }}" class="mt-3">
                         @csrf
                         @method('PATCH')
-                        <button type="submit" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}" class="text-label-md text-on-surface-variant">
-                            {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                        <button type="submit" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}" class="flex items-center gap-2 text-label-md text-on-surface-variant">
+                            <x-icon name="language" /> {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                         </button>
                     </form>
                     <form method="POST" action="{{ route('logout') }}" class="mt-3">
@@ -59,6 +59,10 @@
                             <x-icon name="logout" /> {{ __('Sign out') }}
                         </button>
                     </form>
+                    <p class="mt-4 text-label-sm text-on-surface-variant">
+                        v1.0 &middot; {{ __('Developed by') }}
+                        <a href="https://deverra.me" target="_blank" rel="noopener" class="hover:underline">DeVerra Technologies</a>
+                    </p>
                 </div>
             </aside>
 
