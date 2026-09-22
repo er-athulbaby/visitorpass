@@ -36,10 +36,11 @@ class SettingsController extends Controller
             $data['favicon_path'] = $request->file('favicon')->store('branding', 'public');
         }
 
-        $data['smtp_host'] = $validated['smtp_host'] ?? null;
-        $data['smtp_port'] = $validated['smtp_port'] ?? null;
-        $data['smtp_username'] = $validated['smtp_username'] ?? null;
-        $data['smtp_from_address'] = $validated['smtp_from_address'] ?? null;
+        foreach (['smtp_host', 'smtp_port', 'smtp_username', 'smtp_from_address'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $data[$field] = $validated[$field];
+            }
+        }
 
         if (! empty($validated['smtp_password'])) {
             $data['smtp_password_encrypted'] = $validated['smtp_password'];

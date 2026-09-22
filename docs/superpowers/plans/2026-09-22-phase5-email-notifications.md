@@ -146,13 +146,18 @@ class NotificationMailer
             return false;
         }
 
-        Config::set('mail.mailers.smtp.host', $setting->smtp_host);
-        Config::set('mail.mailers.smtp.port', $setting->smtp_port);
-        Config::set('mail.mailers.smtp.username', $setting->smtp_username);
-        Config::set('mail.mailers.smtp.password', $setting->smtp_password_encrypted);
-        Config::set('mail.from.address', $setting->smtp_from_address);
-
         try {
+            Config::set('mail.mailers.smtp.host', $setting->smtp_host);
+            Config::set('mail.mailers.smtp.port', $setting->smtp_port);
+            Config::set('mail.mailers.smtp.username', $setting->smtp_username);
+            // Reading this attribute decrypts it via the `encrypted` cast,
+            // which can throw — must stay inside this try.
+            Config::set('mail.mailers.smtp.password', $setting->smtp_password_encrypted);
+            Config::set('mail.from.address', $setting->smtp_from_address);
+            // Fail fast on an unreachable/firewalled host instead of hanging
+            // for PHP's default socket timeout.
+            Config::set('mail.mailers.smtp.timeout', 5);
+
             Mail::mailer('smtp')->to($to)->send($mailable);
 
             return true;
@@ -168,6 +173,10 @@ class NotificationMailer
 Note: `$setting->smtp_password_encrypted` reads as the **decrypted** plain
 password — Eloquent's `encrypted` cast (added in Step 3) decrypts
 transparently on access, so this is correct despite the attribute's name.
+(Corrected post-review: the `Config::set` block and the explicit timeout
+must be inside the `try` — an earlier version of this plan put them
+outside it, which would let an `APP_KEY` change or an unreachable host
+break check-in instead of degrading silently.)
 
 - [ ] **Step 5: Run tests to verify they pass**
 
@@ -512,15 +521,23 @@ after the existing `$data` array is built and before
 `Setting::current()->update($data);`:
 
 ```php
-        $data['smtp_host'] = $validated['smtp_host'] ?? null;
-        $data['smtp_port'] = $validated['smtp_port'] ?? null;
-        $data['smtp_username'] = $validated['smtp_username'] ?? null;
-        $data['smtp_from_address'] = $validated['smtp_from_address'] ?? null;
+        foreach (['smtp_host', 'smtp_port', 'smtp_username', 'smtp_from_address'] as $field) {
+            if (array_key_exists($field, $validated)) {
+                $data[$field] = $validated[$field];
+            }
+        }
 
         if (! empty($validated['smtp_password'])) {
             $data['smtp_password_encrypted'] = $validated['smtp_password'];
         }
 ```
+
+(Corrected post-review: using `array_key_exists` instead of `?? null`
+means a future request that omits these fields entirely — a different
+form, an API call — doesn't silently wipe previously-saved SMTP
+settings. The single form this plan builds always posts all fields, so
+this was latent rather than user-visible, but it's a silent-data-loss
+trap for whoever adds the next settings entry point.)
 
 - [ ] **Step 5: Add the fields to the settings view**
 

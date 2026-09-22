@@ -76,13 +76,21 @@ class NotificationMailer
             return false;
         }
 
-        Config::set('mail.mailers.smtp.host', $setting->smtp_host);
-        Config::set('mail.mailers.smtp.port', $setting->smtp_port);
-        Config::set('mail.mailers.smtp.username', $setting->smtp_username);
-        Config::set('mail.mailers.smtp.password', $setting->smtp_password_encrypted);
-        Config::set('mail.from.address', $setting->smtp_from_address);
-
         try {
+            Config::set('mail.mailers.smtp.host', $setting->smtp_host);
+            Config::set('mail.mailers.smtp.port', $setting->smtp_port);
+            Config::set('mail.mailers.smtp.username', $setting->smtp_username);
+            // Reading this attribute decrypts it via the `encrypted` cast,
+            // which can throw (e.g. after an APP_KEY change) — must stay
+            // inside this try, or a broken value 500s the check-in it's
+            // attached to instead of degrading to "email not sent".
+            Config::set('mail.mailers.smtp.password', $setting->smtp_password_encrypted);
+            Config::set('mail.from.address', $setting->smtp_from_address);
+            // A firewalled or unresponsive host must fail fast, not hang for
+            // PHP's ~60s default socket timeout and risk an uncatchable
+            // fatal error from the request's own max_execution_time.
+            Config::set('mail.mailers.smtp.timeout', 5);
+
             Mail::mailer('smtp')->to($to)->send($mailable);
 
             return true;
@@ -99,7 +107,7 @@ class NotificationMailer
 success/failure without needing its own duplicate try/catch, and the
 check-in flow can ignore the return value entirely.
 
-Two implementation notes:
+Implementation notes:
 - `$setting->smtp_password_encrypted` reads as the **decrypted** plain
   password — Eloquent's `encrypted` cast decrypts transparently on
   access, so the attribute name is misleading but the value is correct
@@ -109,6 +117,12 @@ Two implementation notes:
   advertises it, which covers standard providers like Office 365 and
   Gmail on port 587 without an explicit setting. An explicit encryption
   field is deferred until a real provider is found that needs one.
+- The `Config::set` block (including the password decrypt) and the
+  explicit `timeout` **must** stay inside the `try`. An earlier draft of
+  this spec put them outside it, which a whole-branch review caught: an
+  unreachable/firewalled host would hang for PHP's default socket timeout
+  with no way to catch the resulting fatal, and a stale encrypted value
+  would 500 every check-in instead of silently skipping the email.
 
 ### `App\Mail\VisitorCheckedIn` (new)
 
