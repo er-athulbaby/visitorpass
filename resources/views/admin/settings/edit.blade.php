@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-sidebar-layout>
     <div class="p-6 max-w-xl">
         <h1 class="text-xl font-semibold mb-4">{{ __('Settings') }}</h1>
 
@@ -96,4 +96,4 @@
             <button type="submit" class="bg-gray-200 text-gray-800 rounded px-4 py-2">{{ __('Send test email') }}</button>
         </form>
     </div>
-</x-app-layout>
+</x-sidebar-layout>

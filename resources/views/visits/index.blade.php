@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-sidebar-layout>
     <div class="p-6">
         <h1 class="text-xl font-semibold mb-4">{{ __('Open Visits') }}</h1>
 
@@ -40,4 +40,4 @@
             </tbody>
         </table>
     </div>
-</x-app-layout>
+</x-sidebar-layout>

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-sidebar-layout>
     <div class="p-6 max-w-2xl">
         <h1 class="text-xl font-semibold mb-4">{{ __('Departments') }}</h1>
 
@@ -28,4 +28,4 @@
             @endforeach
         </ul>
     </div>
-</x-app-layout>
+</x-sidebar-layout>

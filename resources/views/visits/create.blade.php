@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-sidebar-layout>
     <div class="p-6 max-w-xl">
         <h1 class="text-xl font-semibold mb-4">{{ __('Register Visitor') }}</h1>
 
@@ -227,4 +227,4 @@
             };
         }
     </script>
-</x-app-layout>
+</x-sidebar-layout>
