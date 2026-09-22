@@ -20,6 +20,10 @@ class Setting extends Model
         'smtp_from_address',
     ];
 
+    protected $casts = [
+        'smtp_password_encrypted' => 'encrypted',
+    ];
+
     public static function current(): ?self
     {
         return static::find(1);
