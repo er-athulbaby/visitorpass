@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -25,8 +26,8 @@ class EnsureInstalled
 
         Config::set('session.driver', 'file');
 
-        if ($isInstallRoute) {
-            return $next($request);
+        if (empty(config('app.key'))) {
+            Artisan::call('key:generate', ['--force' => true]);
         }
 
         try {
@@ -38,7 +39,12 @@ class EnsureInstalled
 
         if ($connected && Schema::hasTable('settings')) {
             Storage::disk('local')->put('installed', now()->toString());
+            abort_if($isInstallRoute, 404);
 
+            return $next($request);
+        }
+
+        if ($isInstallRoute) {
             return $next($request);
         }
 

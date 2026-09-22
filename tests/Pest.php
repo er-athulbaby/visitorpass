@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /*
@@ -16,6 +17,19 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->beforeEach(function () {
+        // Every Feature test hits EnsureInstalled, which writes a real marker
+        // file to the local disk when one doesn't exist yet. Faking the disk
+        // for every test keeps that write out of the developer's actual
+        // storage/app/private/ directory. The marker is pre-seeded here so
+        // the ~110 pre-existing tests (which assume an already-installed
+        // app and never touch install/setup themselves) keep behaving that
+        // way; tests that specifically exercise the install flow call
+        // Storage::fake('local') again in their own beforeEach, which resets
+        // this fake disk back to empty for them.
+        Storage::fake('local');
+        Storage::disk('local')->put('installed', now()->toString());
+    })
     ->in('Feature');
 
 /*

@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\EnvFileWriter;
+use Dotenv\Dotenv;
 
 beforeEach(function () {
     $this->path = sys_get_temp_dir().'/env_writer_test_'.uniqid().'.env';
@@ -50,4 +51,36 @@ test('it leaves a plain value unquoted', function () {
 
     expect(file_get_contents($this->path))->toContain('DB_HOST=127.0.0.1');
     expect(file_get_contents($this->path))->not->toContain('"127.0.0.1"');
+});
+
+test('a value containing a dollar sign round-trips through the real .env parser', function () {
+    (new EnvFileWriter($this->path))->update(['DB_PASSWORD' => 'pa$1ss']);
+
+    $parsed = Dotenv::parse(file_get_contents($this->path));
+
+    expect($parsed['DB_PASSWORD'])->toBe('pa$1ss');
+});
+
+test('a value containing a backslash round-trips through the real .env parser', function () {
+    (new EnvFileWriter($this->path))->update(['DB_PASSWORD' => 'pa\\1ss']);
+
+    $parsed = Dotenv::parse(file_get_contents($this->path));
+
+    expect($parsed['DB_PASSWORD'])->toBe('pa\\1ss');
+});
+
+test('a value containing an apostrophe and a space round-trips through the real .env parser', function () {
+    (new EnvFileWriter($this->path))->update(['DB_PASSWORD' => "my pass'word"]);
+
+    $parsed = Dotenv::parse(file_get_contents($this->path));
+
+    expect($parsed['DB_PASSWORD'])->toBe("my pass'word");
+});
+
+test('a value containing a double quote round-trips through the real .env parser', function () {
+    (new EnvFileWriter($this->path))->update(['DB_PASSWORD' => 'p#ss"word']);
+
+    $parsed = Dotenv::parse(file_get_contents($this->path));
+
+    expect($parsed['DB_PASSWORD'])->toBe('p#ss"word');
 });

@@ -13,6 +13,9 @@ afterward:
 - MySQL 8+
 - Composer
 - Node.js + npm (for building frontend assets)
+- The web server user must be able to write to `.env` and to `storage/` —
+  the database setup screen below writes directly to `.env`, and will show
+  a permissions error on that screen if it can't.
 
 ## Installation
 
@@ -51,6 +54,16 @@ php artisan storage:link
 
 The app detects an already-migrated database and skips the database setup
 screen automatically.
+
+### Redoing the database step
+
+Once the database step succeeds, `/install` is permanently disabled by a
+marker file at `storage/app/private/installed` (not `storage/app/installed`
+— Laravel's default `local` disk root is `storage/app/private`). Wrong
+credentials at submit time redisplay the form immediately with no lockout.
+If you need to redo the step after the fact — for example the site reports
+a database error even though the marker exists — delete that marker file
+and revisit the site.
 
 ## Running locally
 

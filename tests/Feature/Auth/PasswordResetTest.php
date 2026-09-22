@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PasswordResetTest extends TestCase
@@ -16,6 +17,12 @@ class PasswordResetTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // PHPUnit-class-style test (Breeze scaffolding) — bypasses
+        // tests/Pest.php's beforeEach hook, so fake the disk here directly.
+        // See ProfileTest.php for the full explanation.
+        Storage::fake('local');
+        Storage::disk('local')->put('installed', now()->toString());
 
         Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     }

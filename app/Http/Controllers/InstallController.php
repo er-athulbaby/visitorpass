@@ -55,10 +55,6 @@ class InstallController extends Controller
             DB::purge('mysql');
             DB::connection()->getPdo();
 
-            if (empty(config('app.key'))) {
-                Artisan::call('key:generate', ['--force' => true]);
-            }
-
             Artisan::call('migrate', ['--force' => true]);
         } catch (Throwable $e) {
             return redirect('/install')->with('install_error', $e->getMessage());

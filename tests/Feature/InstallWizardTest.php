@@ -78,3 +78,23 @@ test('a connection failure redisplays the form with an error and does not write 
     $response->assertSessionHas('install_error');
     expect(Storage::disk('local')->exists('installed'))->toBeFalse();
 });
+
+test('a migration failure redisplays the form with an error and does not write the marker', function () {
+    Artisan::shouldReceive('call')
+        ->once()
+        ->with('migrate', ['--force' => true])
+        ->andThrow(new \RuntimeException('SQLSTATE[42S01]: Base table or view already exists'));
+
+    $response = $this->post('/install', [
+        'db_host' => '127.0.0.1',
+        'db_port' => '3306',
+        'db_database' => 'testing',
+        'db_username' => 'tester',
+        'db_password' => 'secret',
+        'app_url' => 'https://example.com',
+    ]);
+
+    $response->assertRedirect('/install');
+    $response->assertSessionHas('install_error');
+    expect(Storage::disk('local')->exists('installed'))->toBeFalse();
+});

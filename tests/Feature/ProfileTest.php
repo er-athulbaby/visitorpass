@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
@@ -14,6 +15,14 @@ class ProfileTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // This is a PHPUnit-class-style test (Breeze scaffolding), so it
+        // bypasses tests/Pest.php's beforeEach hook (Pest's plugin system
+        // only applies to test()/it()-style files). Fake the disk here
+        // directly, or every request below writes a real marker file into
+        // storage/app/private/ on the developer's machine.
+        Storage::fake('local');
+        Storage::disk('local')->put('installed', now()->toString());
 
         Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     }

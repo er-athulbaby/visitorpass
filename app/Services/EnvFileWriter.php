@@ -20,7 +20,7 @@ class EnvFileWriter
             $pattern = '/^'.preg_quote($key, '/').'=.*$/m';
 
             $contents = preg_match($pattern, $contents)
-                ? preg_replace($pattern, $line, $contents)
+                ? preg_replace_callback($pattern, fn () => $line, $contents)
                 : rtrim($contents)."\n".$line."\n";
         }
 
@@ -29,8 +29,8 @@ class EnvFileWriter
 
     private function format(string $value): string
     {
-        if (preg_match('/[\s#"]/', $value)) {
-            return '"'.addslashes($value).'"';
+        if (preg_match('/[\s#"$]/', $value)) {
+            return '"'.str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value).'"';
         }
 
         return $value;
