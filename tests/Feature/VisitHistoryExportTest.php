@@ -63,3 +63,48 @@ test('export of an empty filtered set still produces a valid CSV with just the h
     expect(substr_count($csv, "\n"))->toBe(0);
     expect($csv)->toContain('"Visitor Name","CPR Number"');
 });
+
+test('export starts with a UTF-8 BOM so Arabic names render correctly in Excel', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get('/history/export');
+
+    $response->assertOk();
+    expect(substr($response->streamedContent(), 0, 3))->toBe("\xEF\xBB\xBF");
+});
+
+test('export escapes values that look like spreadsheet formulas', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+    $department = Department::create(['name' => 'IT']);
+    $employee = Employee::create(['department_id' => $department->id, 'name' => 'Sam Host']);
+    $visitor = Visitor::create(['cpr_number' => '900000011', 'name' => '=HYPERLINK("http://evil","click")']);
+    $visitor->visits()->create(['employee_id' => $employee->id, 'department_id' => $department->id, 'check_in_at' => now()]);
+
+    $response = $this->actingAs($user)->get('/history/export');
+
+    $csv = $response->streamedContent();
+    expect($csv)->not->toContain(',=HYPERLINK');
+    expect($csv)->toContain("'=HYPERLINK");
+});
+
+test('export shows the mobile number captured at that visit, not the visitor current one', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+    $department = Department::create(['name' => 'IT']);
+    $employee = Employee::create(['department_id' => $department->id, 'name' => 'Sam Host']);
+    $visitor = Visitor::create(['cpr_number' => '900000012', 'name' => 'Ahmed', 'mobile_number' => '39998888']);
+    $visitor->visits()->create([
+        'employee_id' => $employee->id,
+        'department_id' => $department->id,
+        'mobile_number' => '33445566',
+        'check_in_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get('/history/export');
+
+    $csv = $response->streamedContent();
+    expect($csv)->toContain('33445566');
+    expect($csv)->not->toContain('39998888');
+});

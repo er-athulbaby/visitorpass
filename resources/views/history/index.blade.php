@@ -73,8 +73,14 @@
                         @foreach ($visits as $visit)
                             <tr>
                                 <td class="px-4 py-3 font-medium text-on-surface">{{ $visit->visitor->name }}</td>
-                                <td class="px-4 py-3 text-on-surface-variant">{{ \Illuminate\Support\Str::mask($visit->visitor->cpr_number, '•', 0, -4) }}</td>
-                                <td class="px-4 py-3 text-on-surface-variant">{{ $visit->visitor->mobile_number }}</td>
+                                @php
+                                    $cpr = $visit->visitor->cpr_number;
+                                    $maskedCpr = mb_strlen($cpr) > 4
+                                        ? str_repeat('•', mb_strlen($cpr) - 4).mb_substr($cpr, -4)
+                                        : str_repeat('•', mb_strlen($cpr));
+                                @endphp
+                                <td class="px-4 py-3 text-on-surface-variant">{{ $maskedCpr }}</td>
+                                <td class="px-4 py-3 text-on-surface-variant">{{ $visit->mobile_number ?? $visit->visitor->mobile_number }}</td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->visitor->company_name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->department?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->employee?->name ?? $visit->company?->name }}</td>

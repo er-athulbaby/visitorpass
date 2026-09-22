@@ -41,6 +41,40 @@ test('history page masks the CPR number', function () {
     $response->assertSee('1234');
 });
 
+test('history shows the mobile number captured at that visit, not the visitor current one', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+    $department = Department::create(['name' => 'IT']);
+    $employee = Employee::create(['department_id' => $department->id, 'name' => 'Sam Host']);
+    $visitor = Visitor::create(['cpr_number' => '900000010', 'name' => 'Ahmed', 'mobile_number' => '39998888']);
+    $visitor->visits()->create([
+        'employee_id' => $employee->id,
+        'department_id' => $department->id,
+        'mobile_number' => '33445566',
+        'check_in_at' => now(),
+    ]);
+
+    $response = $this->actingAs($user)->get('/history');
+
+    $response->assertOk();
+    $response->assertSee('33445566');
+    $response->assertDontSee('39998888');
+});
+
+test('history page masks a short CPR number instead of showing it unmasked', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+    $department = Department::create(['name' => 'IT']);
+    $employee = Employee::create(['department_id' => $department->id, 'name' => 'Sam Host']);
+    $visitor = Visitor::create(['cpr_number' => '1234', 'name' => 'Jane']);
+    $visitor->visits()->create(['employee_id' => $employee->id, 'department_id' => $department->id, 'check_in_at' => now()]);
+
+    $response = $this->actingAs($user)->get('/history');
+
+    $response->assertOk();
+    $response->assertDontSee('>1234<', false);
+});
+
 test('a search filter narrows the results shown', function () {
     Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     $user = User::factory()->create();
@@ -139,4 +173,26 @@ test('pagination shows 20 visits per page and links to page 2', function () {
     $page1->assertDontSee('Visitor 01'); // oldest, should be on page 2
     $page2->assertOk();
     $page2->assertSee('Visitor 01');
+});
+
+test('pagination links preserve the active filters', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+    $department = Department::create(['name' => 'IT']);
+    $employee = Employee::create(['department_id' => $department->id, 'name' => 'Sam Host']);
+
+    foreach (range(1, 25) as $i) {
+        $padded = str_pad($i, 2, '0', STR_PAD_LEFT);
+        $visitor = Visitor::create(['cpr_number' => "90000020{$i}", 'name' => "Findable {$padded}"]);
+        $visitor->visits()->create([
+            'employee_id' => $employee->id,
+            'department_id' => $department->id,
+            'check_in_at' => now()->subMinutes(25 - $i),
+        ]);
+    }
+
+    $response = $this->actingAs($user)->get('/history?search=Findable');
+
+    $response->assertOk();
+    $response->assertSee('search=Findable', false);
 });

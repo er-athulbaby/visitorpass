@@ -52,12 +52,14 @@ class Visit extends Model
     {
         return $query
             ->when($filters['search'] ?? null, function ($q, $search) {
-                $q->whereHas('visitor', function ($vq) use ($search) {
-                    $vq->where('name', 'like', "%{$search}%")
-                        ->orWhere('cpr_number', 'like', "%{$search}%")
-                        ->orWhere('mobile_number', 'like', "%{$search}%")
-                        ->orWhere('company_name', 'like', "%{$search}%");
-                });
+                $escaped = addcslashes($search, '%_\\');
+                $q->where('mobile_number', 'like', "%{$escaped}%")
+                    ->orWhereHas('visitor', function ($vq) use ($escaped) {
+                        $vq->where('name', 'like', "%{$escaped}%")
+                            ->orWhere('cpr_number', 'like', "%{$escaped}%")
+                            ->orWhere('mobile_number', 'like', "%{$escaped}%")
+                            ->orWhere('company_name', 'like', "%{$escaped}%");
+                    });
             })
             ->when($filters['date_from'] ?? null, fn ($q, $date) => $q->where('check_in_at', '>=', $date))
             ->when($filters['date_to'] ?? null, fn ($q, $date) => $q->where('check_in_at', '<=', $date.' 23:59:59'))

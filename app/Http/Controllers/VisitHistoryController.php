@@ -36,28 +36,32 @@ class VisitHistoryController extends Controller
     {
         $filters = $request->only(['search', 'date_from', 'date_to', 'department_id', 'company_id', 'status']);
 
-        $visits = Visit::with('visitor', 'employee', 'company', 'department')
-            ->filtered($filters)
-            ->orderByDesc('check_in_at')
-            ->get();
-
-        return response()->streamDownload(function () use ($visits) {
+        return response()->streamDownload(function () use ($filters) {
             $handle = fopen('php://output', 'w');
+            // BOM so Excel renders Arabic (and other non-ASCII) names correctly
+            // instead of mojibake when the file is double-clicked.
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, ['Visitor Name', 'CPR Number', 'Mobile Number', 'Company', 'Department', 'Person to Visit', 'Check-In', 'Check-Out', 'Status']);
 
-            foreach ($visits as $visit) {
-                fputcsv($handle, [
-                    $visit->visitor->name,
-                    $visit->visitor->cpr_number,
-                    $visit->visitor->mobile_number,
-                    $visit->visitor->company_name ?? '',
-                    $visit->department?->name ?? '',
-                    $visit->employee?->name ?? $visit->company?->name ?? '',
-                    $visit->check_in_at->toIso8601String(),
-                    $visit->check_out_at?->toIso8601String() ?? '',
-                    $visit->isOpen() ? 'INSIDE' : 'CHECKED_OUT',
-                ]);
-            }
+            $safe = fn ($value) => preg_match('/^[=+\-@\t\r]/', (string) $value) ? "'".$value : $value;
+
+            Visit::with('visitor', 'employee', 'company', 'department')
+                ->filtered($filters)
+                ->orderByDesc('check_in_at')
+                ->lazy()
+                ->each(function ($visit) use ($handle, $safe) {
+                    fputcsv($handle, [
+                        $safe($visit->visitor->name),
+                        $visit->visitor->cpr_number,
+                        $visit->mobile_number ?? $visit->visitor->mobile_number,
+                        $safe($visit->visitor->company_name ?? ''),
+                        $visit->department?->name ?? '',
+                        $safe($visit->employee?->name ?? $visit->company?->name ?? ''),
+                        $visit->check_in_at->toIso8601String(),
+                        $visit->check_out_at?->toIso8601String() ?? '',
+                        $visit->isOpen() ? 'INSIDE' : 'CHECKED_OUT',
+                    ]);
+                });
 
             fclose($handle);
         }, 'visitor-history-'.now()->timestamp.'.csv', ['Content-Type' => 'text/csv']);
