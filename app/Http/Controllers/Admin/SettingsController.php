@@ -34,6 +34,15 @@ class SettingsController extends Controller
             $data['favicon_path'] = $request->file('favicon')->store('branding', 'public');
         }
 
+        $data['smtp_host'] = $validated['smtp_host'] ?? null;
+        $data['smtp_port'] = $validated['smtp_port'] ?? null;
+        $data['smtp_username'] = $validated['smtp_username'] ?? null;
+        $data['smtp_from_address'] = $validated['smtp_from_address'] ?? null;
+
+        if (! empty($validated['smtp_password'])) {
+            $data['smtp_password_encrypted'] = $validated['smtp_password'];
+        }
+
         Setting::current()->update($data);
 
         return redirect()->route('admin.settings.edit')

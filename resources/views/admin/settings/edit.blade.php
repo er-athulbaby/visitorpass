@@ -42,6 +42,49 @@
                 @enderror
             </div>
 
+            <h2 class="text-lg font-semibold mt-6 mb-2">{{ __('Email Notifications') }}</h2>
+
+            <div class="mb-4">
+                <label for="smtp_host">{{ __('SMTP Host') }}</label>
+                <input id="smtp_host" name="smtp_host" type="text" value="{{ old('smtp_host', $setting->smtp_host) }}" class="border rounded ps-3 pe-3 py-2 block w-full">
+                @error('smtp_host')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="smtp_port">{{ __('SMTP Port') }}</label>
+                <input id="smtp_port" name="smtp_port" type="text" value="{{ old('smtp_port', $setting->smtp_port) }}" class="border rounded ps-3 pe-3 py-2 block w-full">
+                @error('smtp_port')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="smtp_username">{{ __('SMTP Username') }}</label>
+                <input id="smtp_username" name="smtp_username" type="text" value="{{ old('smtp_username', $setting->smtp_username) }}" class="border rounded ps-3 pe-3 py-2 block w-full">
+                @error('smtp_username')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="smtp_password">{{ __('SMTP Password') }}</label>
+                <input id="smtp_password" name="smtp_password" type="password" value="" class="border rounded ps-3 pe-3 py-2 block w-full">
+                <p class="text-gray-500 text-sm">{{ __('Leave blank to keep the current password.') }}</p>
+                @error('smtp_password')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label for="smtp_from_address">{{ __('From Address') }}</label>
+                <input id="smtp_from_address" name="smtp_from_address" type="text" value="{{ old('smtp_from_address', $setting->smtp_from_address) }}" class="border rounded ps-3 pe-3 py-2 block w-full">
+                @error('smtp_from_address')
+                    <p class="text-red-600 text-sm">{{ $message }}</p>
+                @enderror
+            </div>
+
             <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Save') }}</button>
         </form>
     </div>
