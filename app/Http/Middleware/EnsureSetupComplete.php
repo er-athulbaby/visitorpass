@@ -13,6 +13,10 @@ class EnsureSetupComplete
     {
         $isSetupRoute = $request->is('setup');
 
+        if ($request->is('install')) {
+            return $next($request);
+        }
+
         if (! Setting::isComplete() && ! $isSetupRoute) {
             return redirect('/setup');
         }

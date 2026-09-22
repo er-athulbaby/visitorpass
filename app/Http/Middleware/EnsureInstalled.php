@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
+
+class EnsureInstalled
+{
+    public function handle(Request $request, Closure $next): Response
+    {
+        $isInstallRoute = $request->is('install');
+
+        if (Storage::disk('local')->exists('installed')) {
+            abort_if($isInstallRoute, 404);
+
+            return $next($request);
+        }
+
+        Config::set('session.driver', 'file');
+
+        if ($isInstallRoute) {
+            return $next($request);
+        }
+
+        try {
+            DB::connection()->getPdo();
+            $connected = true;
+        } catch (Throwable) {
+            $connected = false;
+        }
+
+        if ($connected && Schema::hasTable('settings')) {
+            Storage::disk('local')->put('installed', now()->toString());
+
+            return $next($request);
+        }
+
+        return redirect('/install');
+    }
+}

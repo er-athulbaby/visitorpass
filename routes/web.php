@@ -15,6 +15,9 @@ Route::get('/', function () {
     return redirect('/dashboard');
 });
 
+Route::get('/install', fn () => 'install form placeholder')->name('install.index');
+Route::post('/install', fn () => 'install store placeholder')->name('install.store');
+
 Route::get('/setup', [SetupController::class, 'index'])->name('setup.index');
 Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');
 

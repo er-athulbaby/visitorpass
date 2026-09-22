@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->prepend(\App\Http\Middleware\EnsureSetupComplete::class);
+        $middleware->prepend(\App\Http\Middleware\EnsureInstalled::class);
 
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,
