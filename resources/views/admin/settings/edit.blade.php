@@ -87,5 +87,13 @@
 
             <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Save') }}</button>
         </form>
+
+        <form method="POST" action="{{ route('admin.settings.test-email') }}" class="mt-2">
+            @csrf
+            @if (session('error'))
+                <p class="text-red-600 mb-2">{{ session('error') }}</p>
+            @endif
+            <button type="submit" class="bg-gray-200 text-gray-800 rounded px-4 py-2">{{ __('Send test email') }}</button>
+        </form>
     </div>
 </x-app-layout>

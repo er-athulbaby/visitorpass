@@ -61,6 +61,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::post('settings/test-email', [SettingsController::class, 'testEmail'])->name('settings.test-email');
 });
 
 require __DIR__.'/auth.php';

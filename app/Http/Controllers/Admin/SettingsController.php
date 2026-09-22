@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateSettingsRequest;
+use App\Mail\TestEmail;
 use App\Models\Setting;
+use App\Services\NotificationMailer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -47,5 +49,21 @@ class SettingsController extends Controller
 
         return redirect()->route('admin.settings.edit')
             ->with('status', __('Settings updated.'));
+    }
+
+    public function testEmail(NotificationMailer $mailer): RedirectResponse
+    {
+        $setting = Setting::current();
+
+        if (empty($setting->smtp_from_address)) {
+            return redirect()->route('admin.settings.edit')
+                ->with('error', __('Set a From Address before sending a test email.'));
+        }
+
+        $sent = $mailer->send($setting, new TestEmail, $setting->smtp_from_address);
+
+        return $sent
+            ? redirect()->route('admin.settings.edit')->with('status', __('Test email sent.'))
+            : redirect()->route('admin.settings.edit')->with('error', __('Could not send the test email. Check your SMTP settings.'));
     }
 }
