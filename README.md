@@ -65,6 +65,15 @@ If you need to redo the step after the fact — for example the site reports
 a database error even though the marker exists — delete that marker file
 and revisit the site.
 
+## Email notifications
+
+Configure SMTP under **Admin > Settings** — host, port, username,
+password, and a from address. Once a host is set, every visitor check-in
+emails the host (company mode) or the company's contact (building mode),
+if that person has an email on file. Use **Send test email** on the same
+screen to confirm your settings work before relying on them; if it's
+wrong, check-in still succeeds silently and nothing is sent.
+
 ## Running locally
 
 ```bash
