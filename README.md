@@ -21,24 +21,36 @@ composer install
 npm install && npm run build
 
 cp .env.example .env
-php artisan key:generate
 ```
 
-Edit `.env` and set `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` for a MySQL
-database you've created for this install.
+Then visit the site in a browser. On first load you'll land on a database
+setup screen — enter your MySQL host, port, database name, username, and
+password, plus the site's public URL. The app writes these into `.env`,
+generates the application key, and runs migrations automatically; no SSH
+or terminal access is required.
+
+After the database step, the existing setup wizard walks through choosing
+Company or Building mode and creating the first admin account — no
+separate seed step is required.
+
+Run `php artisan storage:link` once, from the server (via SSH, or your
+host's terminal/cron feature) — without it, an admin's uploaded
+logo/favicon (Admin > Settings) will 404 on every page, since public
+uploads are served from `storage/app/public` via that symlink.
+
+### Manual setup (alternative)
+
+If you have SSH access and prefer to configure things yourself, edit
+`.env` directly and run:
 
 ```bash
+php artisan key:generate
 php artisan migrate
 php artisan storage:link
 ```
 
-The `storage:link` step is required — without it, an admin's uploaded
-logo/favicon (Admin > Settings) will 404 on every page, since public
-uploads are served from `storage/app/public` via that symlink.
-
-Then visit the site in a browser. On first load, the setup wizard walks
-through choosing Company or Building mode and creating the first admin
-account — no separate seed step is required.
+The app detects an already-migrated database and skips the database setup
+screen automatically.
 
 ## Running locally
 
