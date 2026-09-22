@@ -9,7 +9,7 @@
     $isSidebar = ($variant ?? 'sidebar') === 'sidebar';
 @endphp
 
-<nav class="{{ $isSidebar ? 'flex flex-1 flex-col gap-1 p-3' : 'fixed inset-x-0 bottom-0 flex border-t border-outline-variant bg-surface-container-lowest' }}">
+<nav class="{{ $isSidebar ? 'flex flex-1 flex-col gap-1 p-3' : 'fixed inset-x-0 bottom-0 flex border-t border-outline-variant bg-surface-container-lowest md:hidden' }}">
     @foreach ($navItems as $item)
         <a
             href="{{ route($item['route']) }}"

@@ -61,6 +61,17 @@ test('the header slot still renders on pages that pass one', function () {
     $response->assertSee(__('Profile'));
 });
 
+test('the locale toggle is still present and functional in the new sidebar', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create(['locale' => 'en']);
+
+    $response = $this->actingAs($user)->get('/dashboard');
+
+    $response->assertOk();
+    $response->assertSee(route('locale.update'), false);
+    $response->assertSee('value="ar"', false);
+});
+
 test('every existing page that used the old layout still renders under the new one', function () {
     Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     Role::firstOrCreate(['name' => 'admin']);

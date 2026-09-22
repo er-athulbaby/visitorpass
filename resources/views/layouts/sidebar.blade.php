@@ -44,6 +44,13 @@
                 <div class="border-t border-outline-variant p-4">
                     <p class="text-label-md text-on-surface">{{ Auth::user()->name }}</p>
                     <p class="text-label-sm text-on-surface-variant">{{ Auth::user()->getRoleNames()->first() === 'admin' ? __('Administrator') : __('Receptionist') }}</p>
+                    <form method="POST" action="{{ route('locale.update') }}" class="mt-3">
+                        @csrf
+                        @method('PATCH')
+                        <button type="submit" name="locale" value="{{ app()->getLocale() === 'ar' ? 'en' : 'ar' }}" class="text-label-md text-on-surface-variant">
+                            {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                        </button>
+                    </form>
                     <form method="POST" action="{{ route('logout') }}" class="mt-3">
                         @csrf
                         <button type="submit" class="flex items-center gap-2 text-label-md text-error">
