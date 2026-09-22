@@ -57,6 +57,7 @@ reason.
 ```
 handle(request, next):
     if marker file exists:
+        abort(404) if request path is 'install'   // door closed for good, see Security
         return next(request)
 
     Config::set('session.driver', 'file')   // DB-backed sessions can't work pre-migration
