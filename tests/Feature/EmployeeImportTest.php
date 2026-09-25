@@ -80,3 +80,29 @@ test('a semicolon-separated file is rejected with a missing column error', funct
         ->assertSessionHasErrors('file');
     expect(Employee::count())->toBe(0);
 });
+
+test('an email differing only in letter case is not treated as a change', function () {
+    Employee::create(['department_id' => $this->it->id, 'name' => 'Pat', 'email' => 'pat@x.test']);
+
+    $this->actingAs($this->admin)
+        ->post('/admin/employees/import', ['file' => csvFile("Name,Department,Email\nPat,IT,PAT@X.test\n")])
+        ->assertSessionHas('import.skipped', ['Pat (IT)']);
+    expect(Employee::first()->email)->toBe('pat@x.test');
+});
+
+test('a receptionist cannot import employees', function () {
+    $receptionist = User::factory()->create();
+    $receptionist->assignRole('receptionist');
+
+    $this->actingAs($receptionist)
+        ->post('/admin/employees/import', ['file' => csvFile("Name,Department\nSam,IT\n")])
+        ->assertForbidden();
+});
+
+test('employee import is not available in building mode', function () {
+    Setting::current()->update(['deployment_mode' => 'building']);
+
+    $this->actingAs($this->admin)
+        ->post('/admin/employees/import', ['file' => csvFile("Name,Department\nSam,IT\n")])
+        ->assertNotFound();
+});

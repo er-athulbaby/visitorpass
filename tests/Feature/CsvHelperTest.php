@@ -47,3 +47,11 @@ test('a file that is not UTF-8 is rejected as a validation error on the file fie
 test('a missing required column is rejected naming the column and what was found', function () {
     Csv::records(csvFile("employee name;department\nSam;IT\n"), [['Employee Name', 'Name'], ['Department']]);
 })->throws(\Illuminate\Validation\ValidationException::class, 'Missing column: Employee Name (found: employee name;department)');
+
+test('duplicate column names are rejected instead of the last one silently winning', function () {
+    Csv::records(csvFile("Name,Email,name\nSam,s@x.test,Other\n"));
+})->throws(\Illuminate\Validation\ValidationException::class, 'Duplicate column: name');
+
+test('line breaks and repeated spaces inside a cell collapse to single spaces', function () {
+    expect(Csv::records(csvFile("Name\n\"Big\r\nCorp   Ltd\"\n")))->toBe([2 => ['name' => 'Big Corp Ltd']]);
+});

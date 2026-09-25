@@ -92,7 +92,7 @@ class EmployeeController extends Controller
             $key = $department->id.'|'.mb_strtolower($name);
 
             if ($existing = $employees->get($key)) {
-                if ($email !== '' && $email !== $existing->email) {
+                if ($email !== '' && strcasecmp($email, (string) $existing->email) !== 0) {
                     $existing->update(['email' => $email]);
                     $updated[] = $label;
                 } else {

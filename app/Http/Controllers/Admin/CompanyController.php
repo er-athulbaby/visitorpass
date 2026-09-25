@@ -71,7 +71,7 @@ class CompanyController extends Controller
             }
 
             if ($existing = $companies->get(mb_strtolower($name))) {
-                if ($email !== '' && $email !== $existing->contact_email) {
+                if ($email !== '' && strcasecmp($email, (string) $existing->contact_email) !== 0) {
                     $existing->update(['contact_email' => $email]);
                     $updated[] = $name;
                 } else {

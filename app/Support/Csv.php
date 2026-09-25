@@ -35,10 +35,19 @@ class Csv
 
         while (($row = fgetcsv($handle, null, ',', '"', '')) !== false) {
             $line++;
-            $values = array_map(fn ($value) => trim((string) $value), $row);
+            // Collapses line breaks inside quoted cells, so a name never contains a newline.
+            $values = array_map(fn ($value) => trim(preg_replace('/\s+/u', ' ', (string) $value)), $row);
 
             if ($header === null) {
                 $header = array_map('mb_strtolower', $values);
+                // Blank duplicates are just trailing empty columns, not a conflict.
+                $duplicates = array_filter(array_diff_assoc($header, array_unique($header)), fn ($name) => $name !== '');
+
+                if ($duplicates) {
+                    fclose($handle);
+
+                    throw ValidationException::withMessages(['file' => __('Duplicate column: :column', ['column' => reset($duplicates)])]);
+                }
 
                 foreach ($required as $names) {
                     if (! array_intersect(array_map('mb_strtolower', $names), $header)) {

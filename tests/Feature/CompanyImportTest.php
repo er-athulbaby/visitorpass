@@ -72,3 +72,20 @@ test('the downloaded template, filled in with a text editor, imports cleanly', f
         ->post('/admin/companies/import', ['file' => csvFile($template."Hooli,h@x.test\n")])
         ->assertSessionHas('import', ['created' => 1, 'updated' => [], 'skipped' => [], 'errors' => []]);
 });
+
+test('a contact email differing only in letter case is not treated as a change', function () {
+    Company::create(['name' => 'Acme', 'contact_email' => 'a@x.test']);
+
+    $this->actingAs($this->admin)
+        ->post('/admin/companies/import', ['file' => csvFile("Name,Email\nAcme,A@X.TEST\n")])
+        ->assertSessionHas('import.skipped', ['Acme']);
+});
+
+test('a receptionist cannot import companies', function () {
+    $receptionist = User::factory()->create();
+    $receptionist->assignRole('receptionist');
+
+    $this->actingAs($receptionist)
+        ->post('/admin/companies/import', ['file' => csvFile("Name\nHooli\n")])
+        ->assertForbidden();
+});

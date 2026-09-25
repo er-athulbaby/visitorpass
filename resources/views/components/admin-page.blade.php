@@ -5,9 +5,12 @@
         : [['admin.companies.index', 'admin.companies.*', __('Companies')]];
     $tabs[] = ['admin.users.index', 'admin.users.*', __('Users')];
     $tabs[] = ['admin.settings.edit', 'admin.settings.*', __('Settings')];
+    $current = collect($tabs)->first(fn ($tab) => request()->routeIs($tab[1]))[2] ?? null;
 @endphp
 
 <x-sidebar-layout>
+    <x-slot:title>{{ $current ? $current.' · ' : '' }}{{ __('Administration') }}</x-slot:title>
+
     <div class="mx-auto max-w-6xl px-4 py-6 md:px-8 md:py-10">
         <h1 class="text-headline-md text-on-surface">{{ __('Administration') }}</h1>
 

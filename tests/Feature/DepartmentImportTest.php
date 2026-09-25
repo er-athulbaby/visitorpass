@@ -91,3 +91,25 @@ test('a non-UTF-8 file is rejected before anything is saved', function () {
         ->assertSessionHasErrors('file');
     expect(Department::count())->toBe(0);
 });
+
+test('long skipped lists are capped in the summary', function () {
+    $csv = "Name\n".collect(range(1, 25))->map(fn ($i) => sprintf('Dept %02d', $i))->implode("\n")."\n";
+    $this->actingAs($this->admin)->post('/admin/departments/import', ['file' => csvFile($csv)]);
+    $this->actingAs($this->admin)->post('/admin/departments/import', ['file' => csvFile($csv)]);
+
+    $this->actingAs($this->admin)->get('/admin/departments')
+        ->assertSee('Dept 19, Dept 20 and 5 more');
+});
+
+test('the file input has an accessible label', function () {
+    $this->actingAs($this->admin)->get('/admin/departments')
+        ->assertSee('aria-label="CSV file"', false);
+});
+
+test('department import is not available in building mode', function () {
+    Setting::current()->update(['deployment_mode' => 'building']);
+
+    $this->actingAs($this->admin)
+        ->post('/admin/departments/import', ['file' => csvFile("Name\nHR\n")])
+        ->assertNotFound();
+});

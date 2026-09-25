@@ -45,3 +45,10 @@ test('flash messages render once through the admin page', function () {
 
     expect(substr_count($response->getContent(), 'Something failed'))->toBe(1);
 });
+
+test('the browser title names the current admin section', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+
+    $this->actingAs($this->admin)->get('/admin/employees')
+        ->assertSee('<title>Employees · Administration · ', false);
+});
