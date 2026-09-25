@@ -4,7 +4,7 @@ use App\Models\Setting;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
-test('an admin in company mode sees all nav sections including departments and employees', function () {
+test('an admin in company mode sees all nav sections with a single admin link', function () {
     Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     Role::firstOrCreate(['name' => 'admin']);
     $admin = User::factory()->create();
@@ -18,8 +18,8 @@ test('an admin in company mode sees all nav sections including departments and e
     $response->assertSee('Visitors');
     $response->assertSee('History');
     $response->assertSee('Admin');
-    $response->assertSee('Departments');
-    $response->assertSee('Employees');
+    $response->assertSee(route('admin.departments.index'), false);
+    $response->assertDontSee('Employees');
     $response->assertDontSee('Companies');
 });
 
@@ -32,7 +32,7 @@ test('an admin in building mode sees companies instead of departments and employ
     $response = $this->actingAs($admin)->get('/dashboard');
 
     $response->assertOk();
-    $response->assertSee('Companies');
+    $response->assertSee(route('admin.companies.index'), false);
     $response->assertDontSee('Departments');
     $response->assertDontSee('Employees');
 });

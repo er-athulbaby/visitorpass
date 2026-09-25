@@ -17,7 +17,7 @@ test('a receptionist sees a link to visits from the dashboard', function () {
     $response->assertSee(route('visits.index'), false);
 });
 
-test('an admin in company mode sees links to departments and employees but not companies', function () {
+test('an admin in company mode gets a single admin link to departments', function () {
     Setting::create(['id' => 1, 'deployment_mode' => 'company']);
     $admin = User::factory()->create();
     $admin->assignRole('admin');
@@ -25,8 +25,8 @@ test('an admin in company mode sees links to departments and employees but not c
     $response = $this->actingAs($admin)->get('/dashboard');
 
     $response->assertSee(route('admin.departments.index'), false);
-    $response->assertSee(route('admin.employees.index'), false);
-    $response->assertSee(route('admin.users.index'), false);
+    $response->assertDontSee(route('admin.employees.index'), false);
+    $response->assertDontSee(route('admin.users.index'), false);
     $response->assertDontSee(route('admin.companies.index'), false);
 });
 
