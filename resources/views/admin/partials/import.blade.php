@@ -1,0 +1,39 @@
+<section class="mb-6 rounded-xl border border-outline-variant bg-surface-container-lowest p-5">
+    <h2 class="text-headline-sm text-on-surface">{{ __('Bulk import') }}</h2>
+    <p class="mt-1 text-body-md text-on-surface-variant">{{ __('Upload a CSV file with the columns: :columns', ['columns' => $columns]) }}</p>
+
+    <form method="POST" action="{{ route($route.'.import') }}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-center gap-3">
+        @csrf
+        <input type="file" name="file" accept=".csv,text/csv" required class="text-body-md">
+        <button type="submit" class="bg-primary text-on-primary rounded-lg px-4 py-2">{{ __('Import') }}</button>
+        <a href="{{ route($route.'.template') }}" class="rounded-lg border border-outline-variant px-4 py-2">{{ __('Download template') }}</a>
+    </form>
+
+    @error('file')
+        <p class="mt-2 text-red-600" role="alert">{{ $message }}</p>
+    @enderror
+
+    @if ($import = session('import'))
+        <div class="mt-4 space-y-2 text-body-md" role="status">
+            <p class="text-on-surface">
+                {{ __(':count created', ['count' => $import['created']]) }} ·
+                {{ __(':count updated', ['count' => count($import['updated'])]) }} ·
+                {{ __(':count skipped', ['count' => count($import['skipped'])]) }} ·
+                {{ __(':count errors', ['count' => count($import['errors'])]) }}
+            </p>
+            @if ($import['updated'])
+                <p class="text-on-surface-variant">{{ __('Updated') }}: {{ implode(', ', $import['updated']) }}</p>
+            @endif
+            @if ($import['skipped'])
+                <p class="text-on-surface-variant">{{ __('Skipped (already exist)') }}: {{ implode(', ', $import['skipped']) }}</p>
+            @endif
+            @if ($import['errors'])
+                <ul class="list-disc ps-5 text-red-600">
+                    @foreach ($import['errors'] as $error)
+                        <li>{{ __('Row :row: :message', ['row' => $error['row'], 'message' => $error['message']]) }}</li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+    @endif
+</section>

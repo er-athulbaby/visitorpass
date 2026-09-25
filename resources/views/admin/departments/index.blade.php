@@ -9,6 +9,8 @@
             <p class="text-red-600 mb-3" role="alert">{{ session('error') }}</p>
         @endif
 
+        @include('admin.partials.import', ['route' => 'admin.departments', 'columns' => 'Department Name'])
+
         <form method="POST" action="{{ route('admin.departments.store') }}" class="flex gap-2 mb-6">
             @csrf
             <input type="text" name="name" placeholder="{{ __('Department name') }}" class="border rounded ps-3 pe-3 py-2 flex-1" required>

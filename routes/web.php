@@ -52,6 +52,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::middleware('mode:company')->group(function () {
+        Route::get('departments/template', [DepartmentController::class, 'template'])->name('departments.template');
+        Route::post('departments/import', [DepartmentController::class, 'import'])->name('departments.import');
         Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
         Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'destroy']);
     });
