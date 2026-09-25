@@ -84,8 +84,8 @@
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->visitor->company_name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->department?->name ?? '—' }}</td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->employee?->name ?? $visit->company?->name }}</td>
-                                <td class="px-4 py-3 text-on-surface-variant">{{ $visit->check_in_at->format('M j, Y g:i A') }}</td>
-                                <td class="px-4 py-3 text-on-surface-variant">{{ $visit->check_out_at?->format('g:i A') ?? '—' }}</td>
+                                <td class="px-4 py-3 text-on-surface-variant">{{ $visit->check_in_at->translatedFormat('M j, Y g:i A') }}</td>
+                                <td class="px-4 py-3 text-on-surface-variant">{{ $visit->check_out_at?->translatedFormat('g:i A') ?? '—' }}</td>
                                 <td class="px-4 py-3 text-on-surface-variant">{{ $visit->isOpen() ? __('Inside') : __('Checked Out') }}</td>
                             </tr>
                         @endforeach

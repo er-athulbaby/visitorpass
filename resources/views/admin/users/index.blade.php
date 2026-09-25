@@ -14,7 +14,7 @@
     <ul>
         @foreach ($users as $user)
             <li class="flex justify-between items-center border-b py-2">
-                <span>{{ $user->name }} ({{ $user->roles->pluck('name')->join(', ') }})</span>
+                <span>{{ $user->name }} ({{ $user->roles->pluck('name')->map(fn ($role) => $role === 'admin' ? __('Administrator') : __('Receptionist'))->join(', ') }})</span>
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}">
                     @csrf
                     @method('DELETE')

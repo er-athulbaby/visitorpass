@@ -47,7 +47,7 @@
                             <p class="text-label-sm text-on-surface-variant">
                                 {{ $visit->isOpen() ? __('Inside') : __('Checked Out') }}
                             </p>
-                            <p class="text-label-sm text-on-surface-variant">{{ $visit->check_in_at->format('g:i A') }}</p>
+                            <p class="text-label-sm text-on-surface-variant">{{ $visit->check_in_at->translatedFormat('g:i A') }}</p>
                         </div>
                     </div>
                 @empty
