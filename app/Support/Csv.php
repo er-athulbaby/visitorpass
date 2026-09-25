@@ -3,18 +3,32 @@
 namespace App\Support;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Csv
 {
     /**
-     * Parse an uploaded CSV whose first line is a header row.
+     * Parse an uploaded CSV whose first line is a header row. Each entry of
+     * $required is a list of accepted names for one column the file must have.
      *
+     * @throws ValidationException on the 'file' field for non-UTF-8 files or missing columns
      * @return array<int, array<string, string>> keyed by spreadsheet line number
      */
-    public static function records(UploadedFile $file): array
+    public static function records(UploadedFile $file, array $required = []): array
     {
+        if (! mb_check_encoding(file_get_contents($file->getRealPath()), 'UTF-8')) {
+            throw ValidationException::withMessages(['file' => __('The file is not UTF-8. In Excel, save it as "CSV UTF-8".')]);
+        }
+
         $handle = fopen($file->getRealPath(), 'r');
+
+        // Excel (and our own template) prepend a UTF-8 BOM; it must go before
+        // fgetcsv sees it, or a quoted first header keeps its quotes.
+        if (fread($handle, 3) !== "\xEF\xBB\xBF") {
+            rewind($handle);
+        }
+
         $header = null;
         $records = [];
         $line = 0;
@@ -24,9 +38,18 @@ class Csv
             $values = array_map(fn ($value) => trim((string) $value), $row);
 
             if ($header === null) {
-                // Excel prepends a UTF-8 BOM, which would otherwise glue itself to the first header.
-                $values[0] = trim(preg_replace('/^\xEF\xBB\xBF/', '', $values[0]));
                 $header = array_map('mb_strtolower', $values);
+
+                foreach ($required as $names) {
+                    if (! array_intersect(array_map('mb_strtolower', $names), $header)) {
+                        fclose($handle);
+
+                        throw ValidationException::withMessages(['file' => __('Missing column: :column (found: :found)', [
+                            'column' => $names[0],
+                            'found' => implode(', ', $values),
+                        ])]);
+                    }
+                }
 
                 continue;
             }

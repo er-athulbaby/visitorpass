@@ -41,7 +41,7 @@ class CompanyController extends Controller
     {
         $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:2048']]);
 
-        $records = Csv::records($request->file('file'));
+        $records = Csv::records($request->file('file'), [['Company Name', 'Name', 'Company']]);
 
         if ($records === []) {
             return redirect()->route('admin.companies.index')

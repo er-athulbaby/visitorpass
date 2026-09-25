@@ -33,3 +33,17 @@ test('template streams a BOM and the header row as csv', function () {
     expect($response->headers->get('Content-Type'))->toContain('text/csv');
     expect($body)->toBe("\xEF\xBB\xBF\"Company Name\",\"Contact Email\"\n");
 });
+
+test('a BOM before a quoted first header is stripped, so the downloaded template round-trips', function () {
+    $records = Csv::records(csvFile("\xEF\xBB\xBF\"Company Name\",\"Contact Email\"\nAcme,a@x.test\n"));
+
+    expect($records)->toBe([2 => ['company name' => 'Acme', 'contact email' => 'a@x.test']]);
+});
+
+test('a file that is not UTF-8 is rejected as a validation error on the file field', function () {
+    Csv::records(csvFile("Name\nCaf\xE9\n"));
+})->throws(\Illuminate\Validation\ValidationException::class, 'CSV UTF-8');
+
+test('a missing required column is rejected naming the column and what was found', function () {
+    Csv::records(csvFile("employee name;department\nSam;IT\n"), [['Employee Name', 'Name'], ['Department']]);
+})->throws(\Illuminate\Validation\ValidationException::class, 'Missing column: Employee Name (found: employee name;department)');

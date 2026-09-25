@@ -77,3 +77,17 @@ test('the departments page shows the import form and the import summary', functi
     $response->assertSee('1 created');
     $response->assertSee('Row 3: Missing or invalid department name');
 });
+
+test('a file without a header row is rejected instead of silently dropping its first department', function () {
+    $this->actingAs($this->admin)
+        ->post('/admin/departments/import', ['file' => csvFile("HR\nIT\n")])
+        ->assertSessionHasErrors('file');
+    expect(Department::count())->toBe(0);
+});
+
+test('a non-UTF-8 file is rejected before anything is saved', function () {
+    $this->actingAs($this->admin)
+        ->post('/admin/departments/import', ['file' => csvFile("Name\nHR\nCaf\xE9\n")])
+        ->assertSessionHasErrors('file');
+    expect(Department::count())->toBe(0);
+});

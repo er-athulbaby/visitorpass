@@ -64,3 +64,11 @@ test('the companies page shows the import form', function () {
     $this->actingAs($this->admin)->get('/admin/companies')
         ->assertSee(route('admin.companies.import'), false);
 });
+
+test('the downloaded template, filled in with a text editor, imports cleanly', function () {
+    $template = $this->actingAs($this->admin)->get('/admin/companies/template')->streamedContent();
+
+    $this->actingAs($this->admin)
+        ->post('/admin/companies/import', ['file' => csvFile($template."Hooli,h@x.test\n")])
+        ->assertSessionHas('import', ['created' => 1, 'updated' => [], 'skipped' => [], 'errors' => []]);
+});

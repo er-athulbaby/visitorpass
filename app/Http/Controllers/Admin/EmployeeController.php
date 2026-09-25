@@ -49,7 +49,7 @@ class EmployeeController extends Controller
     {
         $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:2048']]);
 
-        $records = Csv::records($request->file('file'));
+        $records = Csv::records($request->file('file'), [['Employee Name', 'Name'], ['Department', 'Department Name']]);
 
         if ($records === []) {
             return redirect()->route('admin.employees.index')

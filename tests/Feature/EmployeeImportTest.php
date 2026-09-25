@@ -73,3 +73,10 @@ test('the employees page shows the import form', function () {
         ->assertSee(route('admin.employees.import'), false)
         ->assertSee(route('admin.employees.template'), false);
 });
+
+test('a semicolon-separated file is rejected with a missing column error', function () {
+    $this->actingAs($this->admin)
+        ->post('/admin/employees/import', ['file' => csvFile("Employee Name;Department;Email\nSam;IT;\n")])
+        ->assertSessionHasErrors('file');
+    expect(Employee::count())->toBe(0);
+});
