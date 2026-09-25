@@ -98,3 +98,14 @@ test('a migration failure redisplays the form with an error and does not write t
     $response->assertSessionHas('install_error');
     expect(Storage::disk('local')->exists('installed'))->toBeFalse();
 });
+
+test('before install, cache uses files so nothing touches the not-yet-configured database', function () {
+    // Production uses CACHE_STORE=database. Until install finishes the DB
+    // credentials are placeholders, so the install form's rate limiter
+    // reading the cache table crashed the page with a 500.
+    config(['cache.default' => 'database']);
+
+    $this->get('/install')->assertOk();
+
+    expect(config('cache.default'))->toBe('file');
+});
