@@ -172,13 +172,16 @@
                         this.companyName = (data.EmployerName || data.SponserNameEnglish || data.EmploymentNameEnglish || '').trim();
                         this.scanMessage = '';
 
-                        await this.lookupCpr();
+                        await this.lookupCpr(true);
                     } catch (error) {
                         this.scanMessage = '{{ __('Reader not available — enter CPR manually.') }}';
                     }
                 },
 
-                async lookupCpr() {
+                // Fills the form from a returning visitor's saved record. After a card
+                // scan the card's name/company win and saved values only fill gaps;
+                // for a hand-typed or picked CPR the saved record wins.
+                async lookupCpr(fromCard = false) {
                     if (!this.cprNumber) {
                         return;
                     }
@@ -187,8 +190,18 @@
                         const response = await fetch(`/visitors/lookup?cpr=${encodeURIComponent(this.cprNumber)}`);
                         const data = await response.json();
 
-                        if (data && data.mobile_number) {
-                            this.mobileNumber = data.mobile_number;
+                        if (!data || !data.name) {
+                            return;
+                        }
+
+                        this.mobileNumber = data.mobile_number || this.mobileNumber;
+
+                        if (!fromCard || !this.visitorName) {
+                            this.visitorName = data.name;
+                        }
+
+                        if (data.company_name && (!fromCard || !this.companyName)) {
+                            this.companyName = data.company_name;
                         }
                     } catch (error) {
                         // Silent — never block the form on a lookup failure.
