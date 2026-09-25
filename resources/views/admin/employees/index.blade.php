@@ -6,6 +6,8 @@
             <p class="text-green-700 mb-3">{{ session('status') }}</p>
         @endif
 
+        @include('admin.partials.import', ['route' => 'admin.employees', 'columns' => 'Employee Name, Department, Email (optional)'])
+
         <form method="POST" action="{{ route('admin.employees.store') }}" class="flex gap-2 mb-6">
             @csrf
             <select name="department_id" class="border rounded ps-3 pe-3 py-2" required>

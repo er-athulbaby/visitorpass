@@ -55,6 +55,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('departments/template', [DepartmentController::class, 'template'])->name('departments.template');
         Route::post('departments/import', [DepartmentController::class, 'import'])->name('departments.import');
         Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
+        Route::get('employees/template', [EmployeeController::class, 'template'])->name('employees.template');
+        Route::post('employees/import', [EmployeeController::class, 'import'])->name('employees.import');
         Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'destroy']);
     });
 
