@@ -13,7 +13,29 @@ class NotificationMailer
 {
     public function send(Setting $setting, Mailable $mailable, string $to): bool
     {
-        if (empty($setting->smtp_host)) {
+        if (! $this->configure($setting)) {
+            return false;
+        }
+
+        try {
+            Mail::mailer('smtp')->to($to)->send($mailable);
+
+            return true;
+        } catch (Throwable $e) {
+            Log::warning('Email notification failed: '.$e->getMessage());
+
+            return false;
+        }
+    }
+
+    /**
+     * Point this request's mail config at the SMTP settings saved in the admin
+     * panel and make SMTP the default mailer, so framework mail (password reset)
+     * uses it too instead of .env's MAIL_MAILER. Returns false when no SMTP is set.
+     */
+    public function configure(?Setting $setting): bool
+    {
+        if (empty($setting?->smtp_host)) {
             return false;
         }
 
@@ -31,8 +53,7 @@ class NotificationMailer
             // PHP's ~60s default socket timeout and risk hitting the server's
             // max_execution_time with an uncatchable fatal error.
             Config::set('mail.mailers.smtp.timeout', 5);
-
-            Mail::mailer('smtp')->to($to)->send($mailable);
+            Config::set('mail.default', 'smtp');
 
             return true;
         } catch (Throwable $e) {

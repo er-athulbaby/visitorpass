@@ -1,6 +1,7 @@
 <x-guest-layout>
     <form method="POST" action="{{ route('setup.store') }}">
         @csrf
+                <input type="hidden" name="token" value="{{ request('token') }}">
 
         <h1 class="text-xl font-semibold mb-4">{{ __('Welcome — let\'s set up VisitorPass') }}</h1>
 

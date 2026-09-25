@@ -39,7 +39,7 @@ class InstallController extends Controller
                 'APP_URL' => $validated['app_url'],
             ]);
         } catch (Throwable $e) {
-            return redirect('/install')->with('install_error', 'Could not write .env — check file permissions: '.$e->getMessage());
+            return redirect()->route('install.index', array_filter(['token' => $request->input('token')]))->with('install_error', 'Could not write .env — check file permissions: '.$e->getMessage());
         }
 
         Config::set([
@@ -57,11 +57,11 @@ class InstallController extends Controller
 
             Artisan::call('migrate', ['--force' => true]);
         } catch (Throwable $e) {
-            return redirect('/install')->with('install_error', $e->getMessage());
+            return redirect()->route('install.index', array_filter(['token' => $request->input('token')]))->with('install_error', $e->getMessage());
         }
 
         Storage::disk('local')->put('installed', now()->toString());
 
-        return redirect('/setup');
+        return redirect()->route('setup.index', array_filter(['token' => $request->input('token')]));
     }
 }

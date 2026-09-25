@@ -117,3 +117,19 @@ test('the registration page calls lookup and autocomplete through app URLs so a 
     $response->assertSee(str_replace('/', '\/', route('visitors.lookup')), false);
     $response->assertSee(str_replace('/', '\/', route('visitors.autocomplete')), false);
 });
+
+test('a percent sign in the CPR search is literal, so it cannot list every visitor', function () {
+    Visitor::create(['cpr_number' => '900000001', 'name' => 'Sam', 'mobile_number' => '33000000']);
+
+    $this->actingAs($this->receptionist)->get('/visitors/autocomplete?q=%25')
+        ->assertOk()
+        ->assertExactJson([]);
+});
+
+test('visitor lookups are rate limited so the CPR list cannot be scraped', function () {
+    foreach (range(1, 120) as $i) {
+        $this->actingAs($this->receptionist)->get('/visitors/lookup?cpr=9'.$i)->assertOk();
+    }
+
+    $this->actingAs($this->receptionist)->get('/visitors/autocomplete?q=900')->assertStatus(429);
+});

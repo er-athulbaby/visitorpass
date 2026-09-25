@@ -99,6 +99,9 @@ return [
 
     'key' => env('APP_KEY'),
 
+    // Secret that unlocks the install/setup wizards on a fresh deploy (see RequireInstallToken).
+    'install_token' => env('INSTALL_TOKEN'),
+
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))

@@ -33,6 +33,7 @@
 
             <form method="POST" action="{{ url('/install') }}">
                 @csrf
+                <input type="hidden" name="token" value="{{ request('token') }}">
 
                 <label>DB Host</label>
                 <input type="text" name="db_host" value="{{ old('db_host', $values['db_host']) }}">

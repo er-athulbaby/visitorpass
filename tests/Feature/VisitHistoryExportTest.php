@@ -108,3 +108,16 @@ test('export shows the mobile number captured at that visit, not the visitor cur
     expect($csv)->toContain('33445566');
     expect($csv)->not->toContain('39998888');
 });
+
+test('the CSV export is rate limited', function () {
+    $this->seed(\Database\Seeders\RoleSeeder::class);
+    \App\Models\Setting::firstOrCreate(['id' => 1], ['deployment_mode' => 'company']);
+    $user = \App\Models\User::factory()->create();
+    $user->assignRole('receptionist');
+
+    foreach (range(1, 10) as $i) {
+        $this->actingAs($user)->get('/history/export')->assertOk();
+    }
+
+    $this->actingAs($user)->get('/history/export')->assertStatus(429);
+});

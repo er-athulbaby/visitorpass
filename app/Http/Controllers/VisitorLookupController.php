@@ -37,7 +37,7 @@ class VisitorLookupController extends Controller
             return response()->json([]);
         }
 
-        $visitors = Visitor::where('cpr_number', 'like', $query . '%')
+        $visitors = Visitor::where('cpr_number', 'like', addcslashes($query, '%_\\').'%')
             ->orderBy('cpr_number')
             ->limit(8)
             ->get(['id', 'cpr_number', 'name']);

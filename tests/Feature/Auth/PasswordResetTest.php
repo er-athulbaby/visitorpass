@@ -24,7 +24,7 @@ class PasswordResetTest extends TestCase
         Storage::fake('local');
         Storage::disk('local')->put('installed', now()->toString());
 
-        Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+        Setting::create(['id' => 1, 'deployment_mode' => 'company', 'smtp_host' => 'smtp.example.test', 'smtp_port' => 587, 'smtp_from_address' => 'desk@example.test']);
     }
 
     public function test_reset_password_link_screen_can_be_rendered(): void
