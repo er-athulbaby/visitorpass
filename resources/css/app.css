@@ -29,3 +29,8 @@
             focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
     }
 }
+
+/* @tailwindcss/forms pins the select arrow to the right; mirror it for Arabic. */
+[dir="rtl"] select {
+    background-position: left 0.5rem center;
+}

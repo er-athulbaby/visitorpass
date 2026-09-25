@@ -4,7 +4,7 @@
         <input type="text" name="name" placeholder="{{ __('Name') }}" class="border rounded ps-3 pe-3 py-2" required>
         <input type="email" name="email" placeholder="{{ __('Email') }}" class="border rounded ps-3 pe-3 py-2" required>
         <input type="password" name="password" placeholder="{{ __('Password') }}" class="border rounded ps-3 pe-3 py-2" required>
-        <select name="role" class="border rounded ps-3 pe-3 py-2" required>
+        <select name="role" class="border rounded ps-3 pe-10 py-2" required>
             <option value="receptionist">{{ __('Receptionist') }}</option>
             <option value="admin">{{ __('Admin') }}</option>
         </select>

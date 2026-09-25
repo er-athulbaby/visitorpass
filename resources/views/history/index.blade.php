@@ -19,7 +19,7 @@
             @if ($mode === 'company')
                 <div>
                     <label class="text-label-sm text-on-surface-variant">{{ __('Department') }}</label>
-                    <select name="department_id" class="border rounded ps-3 pe-3 py-2 block w-full">
+                    <select name="department_id" class="border rounded ps-3 pe-10 py-2 block w-full">
                         <option value="">{{ __('All Departments') }}</option>
                         @foreach ($departments as $department)
                             <option value="{{ $department->id }}" @selected(($filters['department_id'] ?? null) == $department->id)>{{ $department->name }}</option>
@@ -29,7 +29,7 @@
             @else
                 <div>
                     <label class="text-label-sm text-on-surface-variant">{{ __('Company') }}</label>
-                    <select name="company_id" class="border rounded ps-3 pe-3 py-2 block w-full">
+                    <select name="company_id" class="border rounded ps-3 pe-10 py-2 block w-full">
                         <option value="">{{ __('All Companies') }}</option>
                         @foreach ($companies as $company)
                             <option value="{{ $company->id }}" @selected(($filters['company_id'] ?? null) == $company->id)>{{ $company->name }}</option>
@@ -39,7 +39,7 @@
             @endif
             <div>
                 <label class="text-label-sm text-on-surface-variant">{{ __('Status') }}</label>
-                <select name="status" class="border rounded ps-3 pe-3 py-2 block w-full">
+                <select name="status" class="border rounded ps-3 pe-10 py-2 block w-full">
                     <option value="">{{ __('All Statuses') }}</option>
                     <option value="inside" @selected(($filters['status'] ?? null) === 'inside')>{{ __('Inside') }}</option>
                     <option value="checked_out" @selected(($filters['status'] ?? null) === 'checked_out')>{{ __('Checked Out') }}</option>

@@ -80,7 +80,7 @@
                     @if ($mode === 'company')
                         <div>
                             <label for="employee_id">{{ __('Person to Visit') }}</label>
-                            <select id="employee_id" name="employee_id" class="border rounded ps-3 pe-3 py-2 block w-full" aria-describedby="employee_id-error" required>
+                            <select id="employee_id" name="employee_id" class="border rounded ps-3 pe-10 py-2 block w-full" aria-describedby="employee_id-error" required>
                                 <option value="">{{ __('Select...') }}</option>
                                 @foreach ($employees as $employee)
                                     <option value="{{ $employee->id }}">{{ $employee->name }} — {{ $employee->department->name }}</option>
@@ -93,7 +93,7 @@
                     @else
                         <div>
                             <label for="company_id">{{ __('Company Visiting') }}</label>
-                            <select id="company_id" name="company_id" class="border rounded ps-3 pe-3 py-2 block w-full" aria-describedby="company_id-error" required>
+                            <select id="company_id" name="company_id" class="border rounded ps-3 pe-10 py-2 block w-full" aria-describedby="company_id-error" required>
                                 <option value="">{{ __('Select...') }}</option>
                                 @foreach ($companies as $company)
                                     <option value="{{ $company->id }}">{{ $company->name }}</option>

@@ -3,7 +3,7 @@
 
     <form method="POST" action="{{ route('admin.employees.store') }}" class="flex gap-2 mb-6">
         @csrf
-        <select name="department_id" class="border rounded ps-3 pe-3 py-2" required>
+        <select name="department_id" class="border rounded ps-3 pe-10 py-2" required>
             @foreach ($departments as $department)
                 <option value="{{ $department->id }}">{{ $department->name }}</option>
             @endforeach
