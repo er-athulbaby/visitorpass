@@ -109,3 +109,11 @@ test('the registration page renders successfully', function () {
     $response->assertOk();
     $response->assertSee('Scan CPR');
 });
+
+test('the registration page calls lookup and autocomplete through app URLs so a subfolder install works', function () {
+    $response = $this->actingAs($this->receptionist)->get('/visits/create');
+
+    $response->assertDontSee('fetch(`/visitors', false);
+    $response->assertSee(str_replace('/', '\/', route('visitors.lookup')), false);
+    $response->assertSee(str_replace('/', '\/', route('visitors.autocomplete')), false);
+});

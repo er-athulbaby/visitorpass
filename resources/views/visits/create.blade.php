@@ -187,7 +187,7 @@
                     }
 
                     try {
-                        const response = await fetch(`/visitors/lookup?cpr=${encodeURIComponent(this.cprNumber)}`);
+                        const response = await fetch(@js(route('visitors.lookup')) + '?cpr=' + encodeURIComponent(this.cprNumber));
                         const data = await response.json();
 
                         if (!data || !data.name) {
@@ -218,7 +218,7 @@
 
                     this.autocompleteTimer = setTimeout(async () => {
                         try {
-                            const response = await fetch(`/visitors/autocomplete?q=${encodeURIComponent(this.cprNumber)}`);
+                            const response = await fetch(@js(route('visitors.autocomplete')) + '?q=' + encodeURIComponent(this.cprNumber));
                             this.suggestions = await response.json();
                         } catch (error) {
                             this.suggestions = [];
