@@ -8,7 +8,7 @@
             <option value="receptionist">{{ __('Receptionist') }}</option>
             <option value="admin">{{ __('Admin') }}</option>
         </select>
-        <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Add') }}</button>
+        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
     </form>
 
     <ul>

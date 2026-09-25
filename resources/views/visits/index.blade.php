@@ -9,7 +9,7 @@
             <p class="text-red-600 mb-3" role="alert">{{ session('error') }}</p>
         @endif
 
-        <a href="{{ route('visits.create') }}" class="inline-block bg-primary text-on-primary rounded px-4 py-2 mb-4">
+        <a href="{{ route('visits.create') }}" class="btn btn-primary mb-4">
             {{ __('Register New Visitor') }}
         </a>
 

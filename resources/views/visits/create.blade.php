@@ -67,7 +67,7 @@
                 <div class="bg-amber-50 rounded p-4 mb-4">
                     <h2 class="font-semibold mb-2">{{ __('Visit Details') }}</h2>
 
-                    <button type="button" @click="scanCard()" class="bg-primary text-on-primary rounded px-4 py-2 mb-3">
+                    <button type="button" @click="scanCard()" class="btn btn-primary mb-3">
                         {{ __('Scan CPR') }}
                     </button>
                     <p x-show="scanMessage" x-text="scanMessage" class="text-sm text-gray-600 mb-3"></p>
@@ -106,7 +106,7 @@
                     @endif
                 </div>
 
-                <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Check In') }}</button>
+                <button type="submit" class="btn btn-primary">{{ __('Check In') }}</button>
             </form>
         </div>
     </div>

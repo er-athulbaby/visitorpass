@@ -4,9 +4,9 @@
 
     <form method="POST" action="{{ route($route.'.import') }}" enctype="multipart/form-data" class="mt-4 flex flex-wrap items-center gap-3">
         @csrf
-        <input type="file" name="file" accept=".csv,text/csv" required aria-label="{{ __('CSV file') }}" class="text-body-md">
-        <button type="submit" class="bg-primary text-on-primary rounded-lg px-4 py-2">{{ __('Import') }}</button>
-        <a href="{{ route($route.'.template') }}" class="rounded-lg border border-outline-variant px-4 py-2">{{ __('Download template') }}</a>
+        <input type="file" name="file" accept=".csv,text/csv" required aria-label="{{ __('CSV file') }}" class="file-input min-w-0 flex-1 basis-64">
+        <button type="submit" class="btn btn-primary"><x-icon name="upload" /> {{ __('Import') }}</button>
+        <a href="{{ route($route.'.template') }}" class="btn btn-secondary"><x-icon name="download" /> {{ __('Download template') }}</a>
     </form>
 
     @error('file')

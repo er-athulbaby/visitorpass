@@ -21,7 +21,7 @@
 
         <div class="mb-4">
             <label for="logo">{{ __('Logo') }}</label>
-            <input id="logo" name="logo" type="file" accept="image/*" class="block">
+            <input id="logo" name="logo" type="file" accept="image/*" class="file-input mt-1">
             @error('logo')
                 <p class="text-red-600 text-sm">{{ $message }}</p>
             @enderror
@@ -29,7 +29,7 @@
 
         <div class="mb-4">
             <label for="favicon">{{ __('Favicon') }}</label>
-            <input id="favicon" name="favicon" type="file" accept="image/*" class="block">
+            <input id="favicon" name="favicon" type="file" accept="image/*" class="file-input mt-1">
             @error('favicon')
                 <p class="text-red-600 text-sm">{{ $message }}</p>
             @enderror
@@ -78,11 +78,11 @@
             @enderror
         </div>
 
-        <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Save') }}</button>
+        <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
     </form>
 
     <form method="POST" action="{{ route('admin.settings.test-email') }}" class="mt-2">
         @csrf
-        <button type="submit" class="bg-gray-200 text-gray-800 rounded px-4 py-2">{{ __('Send test email') }}</button>
+        <button type="submit" class="btn btn-secondary"><x-icon name="send" /> {{ __('Send test email') }}</button>
     </form>
 </x-admin-page>

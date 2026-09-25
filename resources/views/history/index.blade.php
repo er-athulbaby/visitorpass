@@ -46,8 +46,8 @@
                 </select>
             </div>
             <div class="flex items-end gap-2 lg:col-span-5">
-                <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Filter') }}</button>
-                <a href="{{ route('history.export', $filters) }}" class="border rounded px-4 py-2">{{ __('Export to CSV') }}</a>
+                <button type="submit" class="btn btn-primary"><x-icon name="filter_alt" /> {{ __('Filter') }}</button>
+                <a href="{{ route('history.export', $filters) }}" class="btn btn-secondary"><x-icon name="download" /> {{ __('Export to CSV') }}</a>
             </div>
         </form>
 

@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-label-md transition
+            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
+            disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn .material-symbols-outlined {
+        font-size: 18px;
+    }
+
+    .btn-primary {
+        @apply bg-primary text-on-primary shadow-sm hover:brightness-95 active:brightness-90;
+    }
+
+    .btn-secondary {
+        @apply border border-outline-variant bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container-low active:bg-surface-container;
+    }
+
+    /* Native file picker, with its "Choose file" button restyled to match .btn-secondary. */
+    .file-input {
+        @apply block w-full cursor-pointer rounded-lg border border-dashed border-outline-variant bg-surface-container-low p-1.5 text-body-md text-on-surface-variant
+            file:me-3 file:cursor-pointer file:rounded-md file:border file:border-solid file:border-outline-variant file:bg-surface-container-lowest
+            file:px-4 file:py-2 file:text-label-md file:text-on-surface file:shadow-sm hover:file:bg-surface-container
+            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+    }
+}

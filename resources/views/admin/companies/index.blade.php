@@ -5,7 +5,7 @@
         @csrf
         <input type="text" name="name" placeholder="{{ __('Company name') }}" class="border rounded ps-3 pe-3 py-2 flex-1" required>
         <input type="email" name="contact_email" placeholder="{{ __('Contact email (optional)') }}" class="border rounded ps-3 pe-3 py-2 flex-1">
-        <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Add') }}</button>
+        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
     </form>
 
     <ul>

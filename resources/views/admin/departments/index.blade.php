@@ -4,7 +4,7 @@
     <form method="POST" action="{{ route('admin.departments.store') }}" class="flex gap-2 mb-6">
         @csrf
         <input type="text" name="name" placeholder="{{ __('Department name') }}" class="border rounded ps-3 pe-3 py-2 flex-1" required>
-        <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Add') }}</button>
+        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
     </form>
 
     <ul>

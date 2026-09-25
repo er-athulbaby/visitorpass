@@ -10,7 +10,7 @@
         </select>
         <input type="text" name="name" placeholder="{{ __('Employee name') }}" class="border rounded ps-3 pe-3 py-2 flex-1" required>
         <input type="email" name="email" placeholder="{{ __('Email (optional)') }}" class="border rounded ps-3 pe-3 py-2 flex-1">
-        <button type="submit" class="bg-primary text-on-primary rounded px-4 py-2">{{ __('Add') }}</button>
+        <button type="submit" class="btn btn-primary">{{ __('Add') }}</button>
     </form>
 
     <ul>
