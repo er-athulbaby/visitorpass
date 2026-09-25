@@ -58,7 +58,7 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function csvFile(string $content): \Illuminate\Http\UploadedFile
 {
-    // ..
+    return \Illuminate\Http\UploadedFile::fake()->createWithContent('import.csv', $content);
 }
