@@ -99,13 +99,10 @@ test('a migration failure redisplays the form with an error and does not write t
     expect(Storage::disk('local')->exists('installed'))->toBeFalse();
 });
 
-test('before install, cache uses files so nothing touches the not-yet-configured database', function () {
-    // Production uses CACHE_STORE=database. Until install finishes the DB
-    // credentials are placeholders, so the install form's rate limiter
-    // reading the cache table crashed the page with a 500.
-    config(['cache.default' => 'database']);
+test('the install form does not depend on the cache, which lives in the not-yet-configured database', function () {
+    // The rate limiter binds to CACHE_STORE=database at boot; before install
+    // the DB credentials are placeholders, so a throttle here was a 500.
+    $middleware = app('router')->getRoutes()->getByName('install.store')->gatherMiddleware();
 
-    $this->get('/install')->assertOk();
-
-    expect(config('cache.default'))->toBe('file');
+    expect(collect($middleware)->filter(fn ($m) => str_starts_with((string) $m, 'throttle')))->toBeEmpty();
 });

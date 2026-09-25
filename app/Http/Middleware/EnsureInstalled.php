@@ -24,10 +24,7 @@ class EnsureInstalled
             return $next($request);
         }
 
-        // Until install finishes the DB credentials are placeholders, so keep
-        // sessions and cache (the install form's rate limiter) off the database.
         Config::set('session.driver', 'file');
-        Config::set('cache.default', 'file');
 
         if (empty(config('app.key'))) {
             Artisan::call('key:generate', ['--force' => true]);

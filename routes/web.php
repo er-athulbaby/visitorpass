@@ -19,7 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/install', [InstallController::class, 'index'])->name('install.index')->middleware(\App\Http\Middleware\RequireInstallToken::class);
-Route::post('/install', [InstallController::class, 'store'])->name('install.store')->middleware([\App\Http\Middleware\RequireInstallToken::class, 'throttle:guest-forms']);
+Route::post('/install', [InstallController::class, 'store'])->name('install.store')->middleware(\App\Http\Middleware\RequireInstallToken::class); // no throttle: the limiter's cache is the DB this form configures
 
 Route::get('/setup', [SetupController::class, 'index'])->name('setup.index')->middleware(\App\Http\Middleware\RequireInstallToken::class);
 Route::post('/setup', [SetupController::class, 'store'])->name('setup.store')->middleware([\App\Http\Middleware\RequireInstallToken::class, 'throttle:guest-forms']);
