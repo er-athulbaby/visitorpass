@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Support\Csv;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CompanyController extends Controller
 {
@@ -28,6 +30,66 @@ class CompanyController extends Controller
 
         return redirect()->route('admin.companies.index')
             ->with('status', __('Company created.'));
+    }
+
+    public function template(): StreamedResponse
+    {
+        return Csv::template('companies-template.csv', ['Company Name', 'Contact Email']);
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate(['file' => ['required', 'file', 'mimes:csv,txt', 'max:2048']]);
+
+        $records = Csv::records($request->file('file'));
+
+        if ($records === []) {
+            return redirect()->route('admin.companies.index')
+                ->with('error', __('The CSV file has no data rows.'));
+        }
+
+        $companies = Company::all()->keyBy(fn ($company) => mb_strtolower($company->name));
+        $created = 0;
+        $updated = [];
+        $skipped = [];
+        $errors = [];
+
+        foreach ($records as $row => $record) {
+            $name = Csv::field($record, 'Company Name', 'Name', 'Company');
+            $email = Csv::field($record, 'Contact Email', 'Email');
+
+            if ($name === '' || mb_strlen($name) > 255) {
+                $errors[] = ['row' => $row, 'message' => __('Missing or invalid company name')];
+
+                continue;
+            }
+
+            if ($email !== '' && (mb_strlen($email) > 255 || filter_var($email, FILTER_VALIDATE_EMAIL) === false)) {
+                $errors[] = ['row' => $row, 'message' => __('Invalid email ":email"', ['email' => $email])];
+
+                continue;
+            }
+
+            if ($existing = $companies->get(mb_strtolower($name))) {
+                if ($email !== '' && $email !== $existing->contact_email) {
+                    $existing->update(['contact_email' => $email]);
+                    $updated[] = $name;
+                } else {
+                    $skipped[] = $name;
+                }
+
+                continue;
+            }
+
+            $companies->put(mb_strtolower($name), Company::create([
+                'name' => $name,
+                'contact_email' => $email !== '' ? $email : null,
+            ]));
+            $created++;
+        }
+
+        return redirect()->route('admin.companies.index')
+            ->with('import', ['created' => $created, 'updated' => $updated, 'skipped' => $skipped, 'errors' => $errors]);
     }
 
     public function destroy(Company $company): RedirectResponse

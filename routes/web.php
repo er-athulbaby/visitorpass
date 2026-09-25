@@ -61,6 +61,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     });
 
     Route::middleware('mode:building')->group(function () {
+        Route::get('companies/template', [CompanyController::class, 'template'])->name('companies.template');
+        Route::post('companies/import', [CompanyController::class, 'import'])->name('companies.import');
         Route::resource('companies', CompanyController::class)->only(['index', 'store', 'destroy']);
     });
 
