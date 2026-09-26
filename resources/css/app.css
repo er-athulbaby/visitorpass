@@ -21,6 +21,14 @@
         @apply border border-outline-variant bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container-low active:bg-surface-container;
     }
 
+    .btn-danger {
+        @apply border border-error/40 bg-surface-container-lowest text-error hover:bg-error-container active:bg-error-container;
+    }
+
+    .btn-sm {
+        @apply px-3 py-1.5;
+    }
+
     /* Native file picker, with its "Choose file" button restyled to match .btn-secondary. */
     .file-input {
         @apply block w-full cursor-pointer rounded-lg border border-dashed border-outline-variant bg-surface-container-low p-1.5 text-body-md text-on-surface-variant

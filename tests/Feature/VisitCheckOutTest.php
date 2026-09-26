@@ -53,3 +53,15 @@ test('open visits list shows only visitors who have not checked out', function (
     $response->assertSee('Open Visitor');
     $response->assertDontSee('Closed Visitor');
 });
+
+test('the open visits list shows check out as a button', function () {
+    $this->seed(\Database\Seeders\RoleSeeder::class);
+    \App\Models\Setting::firstOrCreate(['id' => 1], ['deployment_mode' => 'company']);
+    $user = \App\Models\User::factory()->create();
+    $user->assignRole('receptionist');
+    $visitor = \App\Models\Visitor::create(['cpr_number' => '900000009', 'name' => 'Renjith', 'mobile_number' => '33000000']);
+    \App\Models\Visit::create(['visitor_id' => $visitor->id, 'check_in_at' => now()]);
+
+    $this->actingAs($user)->get('/visits')
+        ->assertSee('class="btn btn-secondary btn-sm"', false);
+});

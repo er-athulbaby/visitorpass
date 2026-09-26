@@ -32,7 +32,7 @@
                             <form method="POST" action="{{ route('visits.check-out', $visit) }}">
                                 @csrf
                                 @method('PATCH')
-                                <button type="submit" class="text-primary">{{ __('Check Out') }}</button>
+                                <button type="submit" class="btn btn-secondary btn-sm"><x-icon name="logout" /> {{ __('Check Out') }}</button>
                             </form>
                         </td>
                     </tr>

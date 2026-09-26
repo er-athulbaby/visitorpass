@@ -15,10 +15,10 @@
         @foreach ($users as $user)
             <li class="flex justify-between items-center border-b py-2">
                 <span>{{ $user->name }} ({{ $user->roles->pluck('name')->map(fn ($role) => $role === 'admin' ? __('Administrator') : __('Receptionist'))->join(', ') }})</span>
-                <form method="POST" action="{{ route('admin.users.destroy', $user) }}">
+                <form method="POST" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm({{ Js::from(__('Are you sure you want to delete this?')) }})">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="text-red-600">{{ __('Remove') }}</button>
+                    <button type="submit" class="btn btn-danger btn-sm"><x-icon name="delete" /> {{ __('Remove') }}</button>
                 </form>
             </li>
         @endforeach

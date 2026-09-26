@@ -35,6 +35,28 @@ class EmployeeController extends Controller
             ->with('status', __('Employee created.'));
     }
 
+    public function edit(Employee $employee): View
+    {
+        return view('admin.employees.edit', [
+            'employee' => $employee,
+            'departments' => Department::orderBy('name')->get(),
+        ]);
+    }
+
+    public function update(Request $request, Employee $employee): RedirectResponse
+    {
+        $validated = $request->validate([
+            'department_id' => ['required', 'exists:departments,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        $employee->update($validated);
+
+        return redirect()->route('admin.employees.index')
+            ->with('status', __('Employee updated.'));
+    }
+
     public function template(): StreamedResponse
     {
         return Csv::template('employees-template.csv', ['Employee Name', 'Department', 'Email']);

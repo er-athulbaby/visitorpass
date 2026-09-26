@@ -57,7 +57,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
         Route::get('employees/template', [EmployeeController::class, 'template'])->name('employees.template');
         Route::post('employees/import', [EmployeeController::class, 'import'])->name('employees.import')->middleware('throttle:heavy');
-        Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
     });
 
     Route::middleware('mode:building')->group(function () {

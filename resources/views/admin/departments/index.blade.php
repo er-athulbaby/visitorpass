@@ -11,10 +11,10 @@
         @foreach ($departments as $department)
             <li class="flex justify-between items-center border-b py-2">
                 <span>{{ $department->name }} ({{ $department->employees_count }})</span>
-                <form method="POST" action="{{ route('admin.departments.destroy', $department) }}">
+                <form method="POST" action="{{ route('admin.departments.destroy', $department) }}" onsubmit="return confirm({{ Js::from(__('Are you sure you want to delete this?')) }})">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="text-red-600">{{ __('Delete') }}</button>
+                    <button type="submit" class="btn btn-danger btn-sm"><x-icon name="delete" /> {{ __('Delete') }}</button>
                 </form>
             </li>
         @endforeach
