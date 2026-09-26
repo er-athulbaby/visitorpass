@@ -39,3 +39,12 @@ test('the primary button component on the login screen uses the brand color', fu
     $response->assertSee('text-on-primary', false);
     $response->assertDontSee('bg-gray-800', false);
 });
+
+test('logo and favicon URLs come from the public disk, so they keep a subfolder like /building', function () {
+    config(['filesystems.disks.public.url' => 'https://example.test/building/storage']);
+    \App\Models\Setting::create(['id' => 1, 'deployment_mode' => 'company', 'logo_path' => 'branding/logo.png', 'favicon_path' => 'branding/icon.png']);
+
+    $this->get('/login')
+        ->assertSee('https://example.test/building/storage/branding/logo.png', false)
+        ->assertSee('https://example.test/building/storage/branding/icon.png', false);
+});

@@ -2,8 +2,8 @@
     $brandSettings = \App\Models\Setting::current();
     $brandPrimary = $brandSettings->primary_color ?? '#0F172A';
     $brandOnPrimary = $brandSettings?->onPrimaryColor() ?? '#FFFFFF';
-    $brandFaviconUrl = $brandSettings?->favicon_path ? \Illuminate\Support\Facades\Storage::url($brandSettings->favicon_path) : asset('favicon.ico');
-    $brandLogoUrl = $brandSettings?->logo_path ? \Illuminate\Support\Facades\Storage::url($brandSettings->logo_path) : null;
+    $brandFaviconUrl = $brandSettings?->favicon_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($brandSettings->favicon_path) : asset('favicon.ico');
+    $brandLogoUrl = $brandSettings?->logo_path ? \Illuminate\Support\Facades\Storage::disk('public')->url($brandSettings->logo_path) : null;
 @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
