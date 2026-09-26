@@ -31,6 +31,21 @@ class DepartmentController extends Controller
             ->with('status', __('Department created.'));
     }
 
+    public function edit(Department $department): View
+    {
+        return view('admin.departments.edit', ['department' => $department]);
+    }
+
+    public function update(Request $request, Department $department): RedirectResponse
+    {
+        $department->update($request->validate([
+            'name' => ['required', 'string', 'max:255'],
+        ]));
+
+        return redirect()->route('admin.departments.index')
+            ->with('status', __('Department updated.'));
+    }
+
     public function template(): StreamedResponse
     {
         return Csv::template('departments-template.csv', ['Department Name']);

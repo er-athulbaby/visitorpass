@@ -12,11 +12,14 @@
         @foreach ($companies as $company)
             <li class="flex justify-between items-center border-b py-2">
                 <span>{{ $company->name }}</span>
+                <div class="flex items-center gap-2">
+                <a href="{{ route('admin.companies.edit', $company) }}" class="btn btn-secondary btn-sm"><x-icon name="edit" /> {{ __('Edit') }}</a>
                 <form method="POST" action="{{ route('admin.companies.destroy', $company) }}" onsubmit="return confirm({{ Js::from(__('Are you sure you want to delete this?')) }})">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger btn-sm"><x-icon name="delete" /> {{ __('Delete') }}</button>
                 </form>
+                </div>
             </li>
         @endforeach
     </ul>

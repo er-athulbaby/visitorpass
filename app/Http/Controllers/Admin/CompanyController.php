@@ -32,6 +32,22 @@ class CompanyController extends Controller
             ->with('status', __('Company created.'));
     }
 
+    public function edit(Company $company): View
+    {
+        return view('admin.companies.edit', ['company' => $company]);
+    }
+
+    public function update(Request $request, Company $company): RedirectResponse
+    {
+        $company->update($request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'contact_email' => ['nullable', 'email', 'max:255'],
+        ]));
+
+        return redirect()->route('admin.companies.index')
+            ->with('status', __('Company updated.'));
+    }
+
     public function template(): StreamedResponse
     {
         return Csv::template('companies-template.csv', ['Company Name', 'Contact Email']);

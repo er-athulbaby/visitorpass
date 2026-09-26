@@ -40,6 +40,40 @@ class UserController extends Controller
             ->with('status', __('User created.'));
     }
 
+    public function edit(User $user): View
+    {
+        return view('admin.users.edit', ['user' => $user]);
+    }
+
+    public function update(Request $request, User $user): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
+            'password' => ['nullable', 'string', 'min:8'],
+            'role' => ['required', Rule::in(['admin', 'receptionist'])],
+        ]);
+
+        // Only admins can reach this form, so blocking your own role change is
+        // what guarantees there is always at least one admin left.
+        if ($user->is($request->user()) && ! $user->hasRole($validated['role'])) {
+            return redirect()->route('admin.users.edit', $user)
+                ->with('error', __('You cannot change your own role.'));
+        }
+
+        $user->fill(['name' => $validated['name'], 'email' => $validated['email']]);
+
+        if (! empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+        $user->syncRoles([$validated['role']]);
+
+        return redirect()->route('admin.users.index')
+            ->with('status', __('User updated.'));
+    }
+
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($user->is($request->user())) {

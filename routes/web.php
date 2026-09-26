@@ -54,7 +54,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::middleware('mode:company')->group(function () {
         Route::get('departments/template', [DepartmentController::class, 'template'])->name('departments.template');
         Route::post('departments/import', [DepartmentController::class, 'import'])->name('departments.import')->middleware('throttle:heavy');
-        Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('departments', DepartmentController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
         Route::get('employees/template', [EmployeeController::class, 'template'])->name('employees.template');
         Route::post('employees/import', [EmployeeController::class, 'import'])->name('employees.import')->middleware('throttle:heavy');
         Route::resource('employees', EmployeeController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
@@ -63,10 +63,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::middleware('mode:building')->group(function () {
         Route::get('companies/template', [CompanyController::class, 'template'])->name('companies.template');
         Route::post('companies/import', [CompanyController::class, 'import'])->name('companies.import')->middleware('throttle:heavy');
-        Route::resource('companies', CompanyController::class)->only(['index', 'store', 'destroy']);
+        Route::resource('companies', CompanyController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
     });
 
-    Route::resource('users', UserController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('users', UserController::class)->only(['index', 'store', 'edit', 'update', 'destroy']);
 
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::patch('settings', [SettingsController::class, 'update'])->name('settings.update');
