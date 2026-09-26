@@ -34,13 +34,13 @@
             <div>
                 <a href="/">
                     @if ($brandLogoUrl)
-                        <img src="{{ $brandLogoUrl }}" alt="{{ config('app.name') }}" class="w-20 h-20 object-contain">
+                        <img src="{{ $brandLogoUrl }}" alt="{{ config('app.name') }}" class="h-28 w-auto max-w-xs object-contain">
                     @else
                         <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
                     @endif
                 </a>
                 @if ($brandSettings?->tagline)
-                    <p class="text-center text-sm text-gray-600 mt-2">{{ $brandSettings->tagline }}</p>
+                    <p class="text-center text-body-lg font-medium text-on-surface mt-3">{{ $brandSettings->tagline }}</p>
                 @endif
             </div>
 

@@ -31,9 +31,9 @@
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-background md:flex">
             <aside class="hidden w-64 shrink-0 flex-col border-e border-outline-variant bg-surface-container-lowest md:flex">
-                <div class="flex items-center justify-center gap-2 border-b border-outline-variant px-6 py-6">
+                <div class="flex items-center justify-center gap-2 border-b border-outline-variant px-4 py-5">
                     @if ($brandLogoUrl)
-                        <img src="{{ $brandLogoUrl }}" alt="{{ config('app.name') }}" class="h-20 object-contain">
+                        <img src="{{ $brandLogoUrl }}" alt="{{ config('app.name') }}" class="max-h-28 w-full object-contain">
                     @else
                         <x-application-logo class="h-20 w-auto fill-current text-on-surface" />
                     @endif
