@@ -104,3 +104,22 @@ test('check-in succeeds even when the SMTP send throws', function () {
 
     $response->assertRedirect(route('visits.index'))->assertSessionHas('status');
 });
+
+test('the check-in email includes the visitor mobile number from this visit', function () {
+    $visitor = \App\Models\Visitor::create(['cpr_number' => '900000077', 'name' => 'Renjith', 'mobile_number' => '33000000']);
+    $visit = \App\Models\Visit::create(['visitor_id' => $visitor->id, 'mobile_number' => '36999999', 'check_in_at' => now()]);
+
+    $html = (new VisitorCheckedIn($visit))->render();
+
+    expect($html)->toContain('36999999');
+});
+
+test('the check-in email falls back to the saved mobile number and omits the line when there is none', function () {
+    $visitor = \App\Models\Visitor::create(['cpr_number' => '900000078', 'name' => 'Sam', 'mobile_number' => '33000000']);
+    $withSaved = \App\Models\Visit::create(['visitor_id' => $visitor->id, 'check_in_at' => now()]);
+    expect((new VisitorCheckedIn($withSaved))->render())->toContain('33000000');
+
+    $nobody = \App\Models\Visitor::create(['cpr_number' => '900000079', 'name' => 'Lee', 'mobile_number' => null]);
+    $without = \App\Models\Visit::create(['visitor_id' => $nobody->id, 'check_in_at' => now()]);
+    expect((new VisitorCheckedIn($without))->render())->not->toContain('Mobile');
+});
