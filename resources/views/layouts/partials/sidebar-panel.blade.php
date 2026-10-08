@@ -22,21 +22,12 @@
         </span>
     </a>
 
-    <div class="mt-1 grid grid-cols-2 gap-1">
-        <form method="POST" action="{{ route('locale.update') }}">
-            @csrf
-            @method('PATCH')
-            <button type="submit" name="locale" value="{{ $isArabic ? 'en' : 'ar' }}" class="nav-item w-full" lang="{{ $isArabic ? 'en' : 'ar' }}">
-                <x-icon name="language" /> {{ $isArabic ? 'English' : 'العربية' }}
-            </button>
-        </form>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="nav-item w-full hover:!bg-error-container hover:!text-error">
-                <x-icon name="logout" class="icon-directional" /> {{ __('Sign out') }}
-            </button>
-        </form>
-    </div>
+    <form method="POST" action="{{ route('logout') }}" class="mt-1">
+        @csrf
+        <button type="submit" class="nav-item w-full hover:!bg-error-container hover:!text-error">
+            <x-icon name="logout" class="icon-directional" /> {{ __('Sign out') }}
+        </button>
+    </form>
 
     <p class="mt-3 px-2 text-[11px] leading-4 text-on-surface-variant">
         v1.0 &middot; {{ __('Developed by') }}

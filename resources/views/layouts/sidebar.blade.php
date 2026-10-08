@@ -77,7 +77,7 @@
                             @csrf
                             @method('PATCH')
                             <button type="submit" name="locale" value="{{ $isArabic ? 'en' : 'ar' }}" class="btn btn-ghost btn-sm" lang="{{ $isArabic ? 'en' : 'ar' }}">
-                                <x-icon name="translate" />
+                                <x-icon name="language" />
                                 <span>{{ $isArabic ? 'English' : 'العربية' }}</span>
                             </button>
                         </form>
