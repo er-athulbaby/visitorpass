@@ -24,6 +24,13 @@ class DashboardController extends Controller
                 ->orderByDesc('check_in_at')
                 ->limit(5)
                 ->get(),
+            // Read-only: the same open visits the Visitors page lists, shown on the
+            // dashboard because "who is inside" is the desk's first question.
+            'insideNow' => Visit::with('visitor', 'employee', 'company')
+                ->whereNull('check_out_at')
+                ->orderByDesc('check_in_at')
+                ->limit(6)
+                ->get(),
             'mode' => Setting::current()->deployment_mode,
         ]);
     }

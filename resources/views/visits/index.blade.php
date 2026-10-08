@@ -1,43 +1,66 @@
 <x-sidebar-layout>
-    <div class="p-6">
-        <h1 class="text-xl font-semibold mb-4">{{ __('Open Visits') }}</h1>
-
-        @if (session('status'))
-            <p class="text-green-700 mb-3">{{ session('status') }}</p>
-        @endif
-        @if (session('error'))
-            <p class="text-red-600 mb-3" role="alert">{{ session('error') }}</p>
-        @endif
-
-        <a href="{{ route('visits.create') }}" class="btn btn-primary mb-4">
-            {{ __('Register New Visitor') }}
+    <x-page-header :title="__('Visitors')" :subtitle="trans_choice(':count visitor is inside the building right now.|:count visitors are inside the building right now.', $openVisits->count(), ['count' => $openVisits->count()])">
+        <a href="{{ route('visits.create') }}" class="btn btn-primary btn-lg">
+            <x-icon name="person_add" /> {{ __('Register New Visitor') }}
         </a>
+    </x-page-header>
 
-        <table class="w-full text-start">
-            <thead>
-                <tr class="border-b">
-                    <th class="text-start py-2">{{ __('Visitor') }}</th>
-                    <th class="text-start py-2">{{ __('Visiting') }}</th>
-                    <th class="text-start py-2">{{ __('Checked In') }}</th>
-                    <th class="text-start py-2"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($openVisits as $visit)
-                    <tr class="border-b">
-                        <td class="py-2">{{ $visit->visitor->name }}</td>
-                        <td class="py-2">{{ $visit->employee?->name ?? $visit->company?->name }}</td>
-                        <td class="py-2">{{ $visit->check_in_at->format('Y-m-d H:i') }}</td>
-                        <td class="py-2">
-                            <form method="POST" action="{{ route('visits.check-out', $visit) }}">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-secondary btn-sm"><x-icon name="logout" /> {{ __('Check Out') }}</button>
-                            </form>
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+    @if (session('status'))
+        <div class="alert alert-success mb-6" role="status"><x-icon name="check_circle" class="shrink-0" /> {{ session('status') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-error mb-6" role="alert"><x-icon name="error" class="shrink-0" /> {{ session('error') }}</div>
+    @endif
+
+    <section class="card" aria-labelledby="open-visits-heading">
+        <div class="card-header">
+            <h2 id="open-visits-heading" class="card-title">{{ __('Open Visits') }}</h2>
+            <span class="badge badge-success tabular">{{ $openVisits->count() }} {{ __('Inside') }}</span>
+        </div>
+
+        @if ($openVisits->isEmpty())
+            <x-empty-state icon="door_front" :title="__('Nobody is inside')" :text="__('Visitors who have checked in and not yet left appear here.')">
+                <a href="{{ route('visits.create') }}" class="btn btn-secondary btn-sm"><x-icon name="person_add" /> {{ __('Register Visitor') }}</a>
+            </x-empty-state>
+        @else
+            <div class="overflow-x-auto">
+                <table class="data-table min-w-[640px]">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Visitor') }}</th>
+                            <th>{{ __('Visiting') }}</th>
+                            <th>{{ __('Checked In') }}</th>
+                            <th>{{ __('Status') }}</th>
+                            <th class="text-end"><span class="sr-only">{{ __('Actions') }}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($openVisits as $visit)
+                            <tr>
+                                <td>
+                                    <p class="font-semibold text-on-surface">{{ $visit->visitor->name }}</p>
+                                    @if ($visit->visitor->company_name)
+                                        <p class="text-[13px] text-on-surface-variant">{{ $visit->visitor->company_name }}</p>
+                                    @endif
+                                </td>
+                                <td>{{ $visit->employee?->name ?? $visit->company?->name }}</td>
+                                <td class="whitespace-nowrap">
+                                    <span class="text-on-surface">{{ $visit->check_in_at->format('Y-m-d H:i') }}</span>
+                                    <span class="block text-[12px]">{{ $visit->check_in_at->diffForHumans(syntax: \Carbon\CarbonInterface::DIFF_ABSOLUTE, short: true) }}</span>
+                                </td>
+                                <td><span class="badge badge-success">{{ __('Inside') }}</span></td>
+                                <td class="text-end">
+                                    <form method="POST" action="{{ route('visits.check-out', $visit) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-secondary btn-sm"><x-icon name="logout" class="icon-directional" /> {{ __('Check Out') }}</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </section>
 </x-sidebar-layout>

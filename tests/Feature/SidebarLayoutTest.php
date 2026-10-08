@@ -53,16 +53,14 @@ test('a receptionist sees no admin section at all', function () {
 
 test('the header slot still renders on pages that pass one', function () {
     Setting::create(['id' => 1, 'deployment_mode' => 'company']);
-    $user = User::factory()->create();
+    $this->actingAs(User::factory()->create());
 
-    $response = $this->actingAs($user)->get('/profile');
+    // No built-in page uses the $header slot any more (pages use <x-page-header>),
+    // but the layout still supports it; render one that passes it.
+    \Illuminate\Support\Facades\View::addNamespace('fixtures', base_path('tests/fixtures/views'));
+    \Illuminate\Support\Facades\Route::middleware('web')->get('/__header-slot-probe', fn () => view('fixtures::header-slot'));
 
-    $response->assertOk();
-    // Asserting on the header wrapper's own markup, not just the word
-    // "Profile" — that word also appears in the page body's own heading
-    // ("Profile Information"), so a plain assertSee('Profile') would
-    // still pass even if the $header slot were deleted entirely.
-    $response->assertSee('font-semibold text-xl text-gray-800 leading-tight', false);
+    $this->get('/__header-slot-probe')->assertOk()->assertSee('<p>Header slot probe</p>', false);
 });
 
 test('the bottom nav is hidden on desktop widths via md:hidden', function () {

@@ -111,7 +111,23 @@ test('recent activity shows only the 5 most recent visits', function () {
 
     $response->assertOk();
     $response->assertViewHas('recentVisits', fn ($visits) => $visits->count() === 5);
-    // The oldest of the six (Visitor 1) should have been excluded.
-    $response->assertDontSee('Visitor 1');
+    // The oldest of the six (Visitor 1) is excluded from recent activity. It is
+    // still inside, so the "Inside now" panel may list it; check the list itself.
+    $response->assertViewHas('recentVisits', fn ($visits) => ! $visits->pluck('visitor.name')->contains('Visitor 1')
+        && $visits->pluck('visitor.name')->contains('Visitor 6'));
     $response->assertSee('Visitor 6');
+});
+
+test('the dashboard lists who is inside now and leaves out visitors who have left', function () {
+    Setting::create(['id' => 1, 'deployment_mode' => 'company']);
+    $user = User::factory()->create();
+    $department = Department::create(['name' => 'IT']);
+    $employee = Employee::create(['department_id' => $department->id, 'name' => 'Sam Host']);
+    $inside = Visitor::create(['cpr_number' => '900000071', 'name' => 'Still Here']);
+    $inside->visits()->create(['employee_id' => $employee->id, 'department_id' => $department->id, 'check_in_at' => now()]);
+    $gone = Visitor::create(['cpr_number' => '900000072', 'name' => 'Already Left']);
+    $gone->visits()->create(['employee_id' => $employee->id, 'department_id' => $department->id, 'check_in_at' => now(), 'check_out_at' => now()]);
+
+    $this->actingAs($user)->get(route('dashboard'))
+        ->assertViewHas('insideNow', fn ($visits) => $visits->pluck('visitor.name')->all() === ['Still Here']);
 });

@@ -35,9 +35,13 @@ test('the primary button component on the login screen uses the brand color', fu
 
     $response = $this->get('/login');
 
-    $response->assertSee('bg-primary', false);
-    $response->assertSee('text-on-primary', false);
+    // The button uses the shared .btn-primary class, which the stylesheet builds
+    // from the brand colour tokens (bg-primary / text-on-primary).
+    $response->assertSee('btn btn-primary', false);
+    $response->assertSee('--color-primary: #EF4135', false);
     $response->assertDontSee('bg-gray-800', false);
+    expect(file_get_contents(resource_path('css/app.css')))
+        ->toMatch('/\.btn-primary\s*\{\s*@apply bg-primary text-on-primary/');
 });
 
 test('logo and favicon URLs come from the public disk, so they keep a subfolder like /building', function () {

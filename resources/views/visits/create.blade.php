@@ -1,114 +1,149 @@
 <x-sidebar-layout>
-    <div class="p-6 max-w-xl">
-        <h1 class="text-xl font-semibold mb-4">{{ __('Register Visitor') }}</h1>
+    <x-page-header :title="__('Register Visitor')" :subtitle="__('Scan the visitor\'s CPR card or enter their details, then check them in.')" />
 
-        @if ($errors->any())
-            <div role="alert" tabindex="-1" class="border border-red-400 bg-red-50 p-3 mb-4 rounded">
-                <h2 class="font-semibold text-red-700">{{ __('There is a problem') }}</h2>
-                <ul class="list-disc ps-5">
+    @if ($errors->any())
+        <div role="alert" tabindex="-1" class="alert alert-error mb-6">
+            <x-icon name="error" class="mt-0.5 shrink-0" />
+            <div>
+                <h2 class="font-semibold">{{ __('There is a problem') }}</h2>
+                <ul class="mt-1 list-disc ps-5">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
             </div>
-        @endif
-
-        <div x-data="cprScan()">
-            <form method="POST" action="{{ route('visits.store') }}" @submit="stopAutocomplete()">
-                @csrf
-
-                <div class="bg-blue-50 rounded p-4 mb-4">
-                    <h2 class="font-semibold mb-2">{{ __('Visitor Information') }}</h2>
-
-                    <div class="mb-3 relative" @click.outside="suggestions = []">
-                        <label for="cpr_number">{{ __('CPR Number') }}</label>
-                        <input
-                            id="cpr_number"
-                            name="cpr_number"
-                            type="text"
-                            class="border rounded ps-3 pe-3 py-2 block w-full"
-                            aria-describedby="cpr_number-error"
-                            x-model="cprNumber"
-                            @input="onCprInput()"
-                            @blur="lookupCpr()"
-                            @keydown.escape="suggestions = []"
-                            autocomplete="off"
-                            required
-                        >
-                        @error('cpr_number')
-                            <p id="cpr_number-error" class="text-red-600 text-sm">{{ $message }}</p>
-                        @enderror
-
-                        <ul
-                            x-show="suggestions.length > 0"
-                            class="absolute z-10 bg-white border rounded w-full mt-1 shadow"
-                        >
-                            <template x-for="suggestion in suggestions" :key="suggestion.id">
-                                <li
-                                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                                    @click="selectSuggestion(suggestion)"
-                                    x-text="suggestion.cpr_number + ' — ' + suggestion.name"
-                                ></li>
-                            </template>
-                        </ul>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="name">{{ __('Visitor Name') }}</label>
-                        <input id="name" name="name" type="text" class="border rounded ps-3 pe-3 py-2 block w-full" x-model="visitorName" required>
-                    </div>
-
-                    <div>
-                        <label for="company_name">{{ __('Company Name') }}</label>
-                        <input id="company_name" name="company_name" type="text" class="border rounded ps-3 pe-3 py-2 block w-full" x-model="companyName">
-                    </div>
-                </div>
-
-                <div class="bg-amber-50 rounded p-4 mb-4">
-                    <h2 class="font-semibold mb-2">{{ __('Visit Details') }}</h2>
-
-                    <button type="button" @click="scanCard()" class="btn btn-primary mb-3">
-                        {{ __('Scan CPR') }}
-                    </button>
-                    <p x-show="scanMessage" x-text="scanMessage" class="text-sm text-gray-600 mb-3"></p>
-
-                    <div class="mb-3">
-                        <label for="mobile_number">{{ __('Mobile Number') }}</label>
-                        <input id="mobile_number" name="mobile_number" type="text" class="border rounded ps-3 pe-3 py-2 block w-full" x-model="mobileNumber">
-                    </div>
-
-                    @if ($mode === 'company')
-                        <div>
-                            <label for="employee_id">{{ __('Person to Visit') }}</label>
-                            <select id="employee_id" name="employee_id" class="border rounded ps-3 pe-10 py-2 block w-full" aria-describedby="employee_id-error" required>
-                                <option value="">{{ __('Select...') }}</option>
-                                @foreach ($employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->name }} — {{ $employee->department->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('employee_id')
-                                <p id="employee_id-error" class="text-red-600 text-sm">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    @else
-                        <div>
-                            <label for="company_id">{{ __('Company Visiting') }}</label>
-                            <select id="company_id" name="company_id" class="border rounded ps-3 pe-10 py-2 block w-full" aria-describedby="company_id-error" required>
-                                <option value="">{{ __('Select...') }}</option>
-                                @foreach ($companies as $company)
-                                    <option value="{{ $company->id }}">{{ $company->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('company_id')
-                                <p id="company_id-error" class="text-red-600 text-sm">{{ $message }}</p>
-                            @enderror
-                        </div>
-                    @endif
-                </div>
-
-                <button type="submit" class="btn btn-primary">{{ __('Check In') }}</button>
-            </form>
         </div>
+    @endif
+
+    <div x-data="cprScan()">
+        <form method="POST" action="{{ route('visits.store') }}" @submit="stopAutocomplete()" class="grid gap-6 lg:grid-cols-5">
+            @csrf
+
+            {{-- Card reader: the fastest path, so it sits first and largest. --}}
+            <section class="card lg:col-span-2 lg:self-start lg:sticky lg:top-24" aria-labelledby="reader-heading">
+                <div class="card-body">
+                    <h2 id="reader-heading" class="card-title">{{ __('Scan CPR card') }}</h2>
+                    <p class="mt-1 text-body-sm text-on-surface-variant">{{ __('Insert the card into the reader, then select Scan CPR.') }}</p>
+
+                    <div class="mt-5 flex flex-col items-center rounded-xl border-2 border-dashed border-outline-variant bg-surface-container-low px-6 py-8 text-center">
+                        <span class="flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-container-lowest text-primary shadow-sm">
+                            <x-icon name="id_card" class="text-[32px]" />
+                        </span>
+                        <button type="button" @click="scanCard()" class="btn btn-primary btn-lg mt-5 w-full sm:w-auto">
+                            <x-icon name="contactless" />
+                            {{ __('Scan CPR') }}
+                        </button>
+                        <p x-show="scanMessage" x-text="scanMessage" class="mt-4 text-body-sm font-medium text-on-surface-variant" role="status" aria-live="polite"></p>
+                    </div>
+
+                    <p class="mt-4 flex items-start gap-2 text-[13px] text-on-surface-variant">
+                        <x-icon name="info" class="mt-px shrink-0 text-[18px]" />
+                        {{ __('No reader? Type the CPR number below. Returning visitors fill in automatically.') }}
+                    </p>
+                </div>
+            </section>
+
+            <div class="space-y-6 lg:col-span-3">
+                <section class="card" aria-labelledby="visitor-heading">
+                    <div class="card-header">
+                        <h2 id="visitor-heading" class="card-title">{{ __('Visitor Information') }}</h2>
+                    </div>
+                    <div class="card-body space-y-4">
+                        <div class="relative" @click.outside="suggestions = []">
+                            <label for="cpr_number" class="field-label">{{ __('CPR Number') }}</label>
+                            <input
+                                id="cpr_number"
+                                name="cpr_number"
+                                type="text"
+                                inputmode="numeric"
+                                class="field tabular"
+                                aria-describedby="cpr_number-error"
+                                x-model="cprNumber"
+                                @input="onCprInput()"
+                                @blur="lookupCpr()"
+                                @keydown.escape="suggestions = []"
+                                autocomplete="off"
+                                required
+                            >
+                            @error('cpr_number')
+                                <p id="cpr_number-error" class="field-error">{{ $message }}</p>
+                            @enderror
+
+                            <ul
+                                x-show="suggestions.length > 0"
+                                x-transition.opacity.duration.150ms
+                                class="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest py-1 shadow-lg"
+                            >
+                                <template x-for="suggestion in suggestions" :key="suggestion.id">
+                                    <li
+                                        class="cursor-pointer px-3 py-2 text-body-sm text-on-surface transition-colors duration-150 hover:bg-surface-container"
+                                        @click="selectSuggestion(suggestion)"
+                                        x-text="suggestion.cpr_number + ' — ' + suggestion.name"
+                                    ></li>
+                                </template>
+                            </ul>
+                        </div>
+
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label for="name" class="field-label">{{ __('Visitor Name') }}</label>
+                                <input id="name" name="name" type="text" class="field" x-model="visitorName" required>
+                            </div>
+
+                            <div>
+                                <label for="company_name" class="field-label">{{ __('Company Name') }}</label>
+                                <input id="company_name" name="company_name" type="text" class="field" x-model="companyName">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card" aria-labelledby="visit-heading">
+                    <div class="card-header">
+                        <h2 id="visit-heading" class="card-title">{{ __('Visit Details') }}</h2>
+                    </div>
+                    <div class="card-body grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="mobile_number" class="field-label">{{ __('Mobile Number') }}</label>
+                            <input id="mobile_number" name="mobile_number" type="text" inputmode="tel" class="field tabular" x-model="mobileNumber">
+                        </div>
+
+                        @if ($mode === 'company')
+                            <div>
+                                <label for="employee_id" class="field-label">{{ __('Person to Visit') }}</label>
+                                <select id="employee_id" name="employee_id" class="field" aria-describedby="employee_id-error" required>
+                                    <option value="">{{ __('Select...') }}</option>
+                                    @foreach ($employees as $employee)
+                                        <option value="{{ $employee->id }}">{{ $employee->name }} — {{ $employee->department->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('employee_id')
+                                    <p id="employee_id-error" class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @else
+                            <div>
+                                <label for="company_id" class="field-label">{{ __('Company Visiting') }}</label>
+                                <select id="company_id" name="company_id" class="field" aria-describedby="company_id-error" required>
+                                    <option value="">{{ __('Select...') }}</option>
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->id }}">{{ $company->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('company_id')
+                                    <p id="company_id-error" class="field-error">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        @endif
+                    </div>
+                    <div class="flex justify-end border-t border-outline-variant px-5 py-4">
+                        <button type="submit" class="btn btn-primary btn-lg w-full sm:w-auto">
+                            <x-icon name="how_to_reg" /> {{ __('Check In') }}
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </form>
     </div>
 
     <script>

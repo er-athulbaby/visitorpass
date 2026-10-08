@@ -2,11 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * VisitorPass design system.
+ * --color-primary is the customer's brand colour (Admin → Settings), set inline
+ * by the layouts. Everything tinted from it is derived here with color-mix, so
+ * any brand colour gets a matching soft background and focus ring.
+ */
+:root {
+    --color-primary-soft: color-mix(in srgb, var(--color-primary) 9%, #ffffff);
+    --color-primary-ring: color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+
+@layer base {
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    body {
+        @apply bg-background text-body-sm text-on-surface;
+        font-feature-settings: 'cv11', 'ss01';
+    }
+
+    /* Figures line up in tables, counters and times. */
+    table,
+    .tabular {
+        font-variant-numeric: tabular-nums;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
 @layer components {
+    /* Material Symbols at a light weight reads as one consistent line-icon set. */
+    .material-symbols-outlined {
+        font-size: 20px;
+        line-height: 1;
+        font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 20;
+    }
+
+    /* Icons that point somewhere (arrows, sign out) mirror in Arabic. */
+    [dir='rtl'] .icon-directional {
+        transform: scaleX(-1);
+    }
+
+    /* ---------- Buttons ---------- */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-label-md transition
-            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary
+        @apply inline-flex min-h-[40px] cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap rounded-lg px-4 py-2 text-label-md font-semibold transition-colors duration-150
             disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--color-primary-ring);
     }
 
     .btn .material-symbols-outlined {
@@ -18,27 +72,156 @@
     }
 
     .btn-secondary {
-        @apply border border-outline-variant bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container-low active:bg-surface-container;
+        @apply border border-outline-variant bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container active:bg-surface-container-high;
+    }
+
+    .btn-ghost {
+        @apply text-on-surface-variant hover:bg-surface-container hover:text-on-surface;
     }
 
     .btn-danger {
-        @apply border border-error/40 bg-surface-container-lowest text-error hover:bg-error-container active:bg-error-container;
+        @apply border border-error/30 bg-surface-container-lowest text-error hover:bg-error-container active:bg-error-container;
     }
 
     .btn-sm {
-        @apply px-3 py-1.5;
+        @apply min-h-[32px] px-3 py-1.5 text-[13px];
     }
 
-    /* Native file picker, with its "Choose file" button restyled to match .btn-secondary. */
+    .btn-lg {
+        @apply min-h-[48px] px-5 text-body-sm;
+    }
+
+    /* ---------- Form fields ---------- */
+    .field-label {
+        @apply mb-1.5 block text-label-md text-on-surface;
+    }
+
+    .field {
+        @apply block min-h-[44px] w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-sm text-on-surface shadow-sm transition-[border-color,box-shadow] duration-150
+            placeholder:text-outline focus:border-primary focus:outline-none focus:ring-0;
+    }
+
+    .field:focus {
+        box-shadow: 0 0 0 3px var(--color-primary-ring);
+    }
+
+    select.field {
+        @apply pe-10;
+    }
+
+    .field-help {
+        @apply mt-1.5 text-[13px] text-on-surface-variant;
+    }
+
+    .field-error {
+        @apply mt-1.5 flex items-center gap-1 text-[13px] font-medium text-error;
+    }
+
+    /* Native file picker with its button restyled to match .btn-secondary. */
     .file-input {
-        @apply block w-full cursor-pointer rounded-lg border border-dashed border-outline-variant bg-surface-container-low p-1.5 text-body-md text-on-surface-variant
+        @apply block w-full cursor-pointer rounded-lg border border-dashed border-outline-variant bg-surface-container-low p-1.5 text-body-sm text-on-surface-variant
             file:me-3 file:cursor-pointer file:rounded-md file:border file:border-solid file:border-outline-variant file:bg-surface-container-lowest
-            file:px-4 file:py-2 file:text-label-md file:text-on-surface file:shadow-sm hover:file:bg-surface-container
-            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+            file:px-4 file:py-2 file:text-label-md file:font-semibold file:text-on-surface file:shadow-sm hover:file:bg-surface-container;
+    }
+
+    /* ---------- Surfaces ---------- */
+    .card {
+        @apply rounded-xl border border-outline-variant bg-surface-container-lowest shadow-[0_1px_2px_rgba(15,23,42,0.04)];
+    }
+
+    .card-header {
+        @apply flex items-center justify-between gap-4 border-b border-outline-variant px-5 py-4;
+    }
+
+    .card-title {
+        @apply text-section-title text-on-surface;
+    }
+
+    .card-body {
+        @apply p-5;
+    }
+
+    /* ---------- Badges ---------- */
+    .badge {
+        @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] font-semibold;
+    }
+
+    .badge::before {
+        content: '';
+        @apply h-1.5 w-1.5 rounded-full bg-current;
+    }
+
+    .badge-success {
+        @apply bg-success-container text-success;
+    }
+
+    .badge-neutral {
+        @apply bg-surface-container text-on-surface-variant;
+    }
+
+    .badge-info {
+        @apply bg-info-container text-[#0369A1];
+    }
+
+    /* ---------- Tables ---------- */
+    .data-table {
+        @apply w-full text-start text-body-sm;
+    }
+
+    .data-table thead th {
+        @apply whitespace-nowrap border-b border-outline-variant bg-surface-container-low px-5 py-3 text-start text-[12px] font-semibold text-on-surface-variant;
+    }
+
+    .data-table tbody td {
+        @apply border-b border-outline-variant px-5 py-3.5 align-middle text-on-surface-variant;
+    }
+
+    .data-table tbody tr {
+        @apply transition-colors duration-150 hover:bg-surface-container-low;
+    }
+
+    .data-table tbody tr:last-child td {
+        @apply border-b-0;
+    }
+
+    /* ---------- Navigation ---------- */
+    .nav-item {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-label-md text-on-surface-variant transition-colors duration-150 hover:bg-surface-container hover:text-on-surface;
+    }
+
+    .nav-item-active {
+        @apply font-semibold text-on-surface;
+        background-color: var(--color-primary-soft);
+    }
+
+    .nav-item-active .material-symbols-outlined {
+        color: var(--color-primary);
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+    }
+
+    .alert {
+        @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-body-sm;
+    }
+
+    .alert-success {
+        @apply border-success/20 bg-success-container text-[#166534];
+    }
+
+    .alert-error {
+        @apply border-error/20 bg-error-container text-on-error-container;
     }
 }
 
 /* @tailwindcss/forms pins the select arrow to the right; mirror it for Arabic. */
-[dir="rtl"] select {
-    background-position: left 0.5rem center;
+[dir='rtl'] select {
+    background-position: left 0.75rem center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+    }
 }
