@@ -13,7 +13,7 @@
 
     <x-page-header :title="__('Administration')" :subtitle="__('Manage the people, access and settings for this installation.')" class="!mb-5" />
 
-    <nav aria-label="{{ __('Administration') }}" class="-mx-4 mb-6 flex gap-1 overflow-x-auto border-b border-outline-variant px-4 md:mx-0 md:px-0">
+    <nav aria-label="{{ __('Administration') }}" class="-mx-4 mb-6 flex gap-1 overflow-x-auto overflow-y-hidden border-b border-outline-variant px-4 md:mx-0 md:px-0">
         @foreach ($tabs as [$route, $pattern, $label, $icon])
             <a href="{{ route($route) }}"@if (request()->routeIs($pattern)) aria-current="page"@endif class="-mb-px flex items-center gap-2 whitespace-nowrap border-b-2 px-3 py-2.5 text-label-md transition-colors duration-150 {{ request()->routeIs($pattern) ? 'border-primary font-semibold text-on-surface' : 'border-transparent text-on-surface-variant hover:border-outline-variant hover:text-on-surface' }}"><x-icon :name="$icon" class="{{ request()->routeIs($pattern) ? 'text-primary' : '' }}" />{{ $label }}</a>
         @endforeach
